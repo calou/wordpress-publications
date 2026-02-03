@@ -71,7 +71,7 @@ krsort($publications_by_year);
 // Build output
 $wrapper_attributes = get_block_wrapper_attributes();
 
-#ob_start();
+ob_start();
 ?>
 <div <?php echo $wrapper_attributes; ?>>
     <?php if (empty($publications_by_year)) : ?>
@@ -94,4 +94,4 @@ $wrapper_attributes = get_block_wrapper_attributes();
     <?php endif; ?>
 </div>
 <?php
-#return ob_get_clean();
+return ob_end_flush();
