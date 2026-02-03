@@ -1,25 +1,29 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "create-block/publications",
-	"version": "0.1.0",
-	"title": "publications",
-	"category": "widgets",
-	"icon": "smiley",
-	"description": "List of publications",
-	"example": {},
-	"supports": {
-		"html": false
-	},
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "create-block/publications",
+  "version": "0.1.0",
+  "title": "publications",
+  "category": "widgets",
+  "icon": "smiley",
+  "description": "List of publications",
+  "example": {},
+  "supports": {
+    "html": false
+  },
   "attributes": {
     "selectedTags": {
       "type": "array",
       "default": []
+    },
+    "matchAllTags": {
+      "type": "boolean",
+      "default": "false"
     }
   },
-	"textdomain": "publications",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"render": "file:./render.php"
+  "textdomain": "publications",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
 }

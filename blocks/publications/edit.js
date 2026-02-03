@@ -1,10 +1,10 @@
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, Spinner } from '@wordpress/components';
+import { PanelBody, Spinner, ToggleControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedTags } = attributes;
+    const { selectedTags, matchAllTags } = attributes;
 
     // Fetch all available tags
     const { tags, isLoading } = useSelect((select) => {
@@ -45,21 +45,35 @@ export default function Edit({ attributes, setAttributes }) {
                     {isLoading ? (
                         <Spinner />
                     ) : (
-                        <FormTokenField
-                            label="Select Tags"
-                            value={selectedTagNames}
-                            suggestions={tagNames}
-                            onChange={onTagsChange}
-                            __experimentalExpandOnFocus
-                            __experimentalShowHowTo={false}
-                        />
+                        <>
+                            <FormTokenField
+                                label="Select Tags"
+                                value={selectedTagNames}
+                                suggestions={tagNames}
+                                onChange={onTagsChange}
+                                __experimentalExpandOnFocus
+                                __experimentalShowHowTo={false}
+                            />
+                            <ToggleControl
+                                label="Match all tags"
+                                help={matchAllTags 
+                                    ? "Posts must have ALL selected tags" 
+                                    : "Posts must have AT LEAST ONE selected tag"
+                                }
+                                checked={matchAllTags}
+                                onChange={(value) => setAttributes({ matchAllTags: value })}
+                            />
+                        </>
                     )}
                 </PanelBody>
             </InspectorControls>
 
             <div {...useBlockProps()}>
                 {selectedTags && selectedTags.length > 0 ? (
-                    <p>Selected tags: {selectedTagNames.join(', ')}</p>
+                    <>
+                        <p>Selected tags: {selectedTagNames.join(', ')}</p>
+                        <p><em>Match mode: {matchAllTags ? 'ALL tags' : 'ANY tag'}</em></p>
+                    </>
                 ) : (
                     <p>No tags selected. Use the sidebar to select tags.</p>
                 )}

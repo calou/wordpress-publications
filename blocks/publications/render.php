@@ -14,6 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 $selected_tags = isset($attributes['selectedTags']) ? $attributes['selectedTags'] : array();
+$match_all     = $attributes['matchAllTags'] ?? false;
 
 // Build query args
 $args = array(
@@ -28,16 +29,18 @@ $args = array(
     ),
 );
 
- // Filter by tags if selected (posts must have ALL selected tags)
-if (!empty($selected_tags)) {
-     $args['tag__and'] = array_map('intval', $selected_tags);
+if ($match_all) {
+    // Posts must have ALL selected tags
+    $args['tag__and'] = $selected_tags;
+} else {
+    // Posts must have AT LEAST ONE selected tag
+    $args['tag__in'] = $selected_tags;
 }
 
 $query = new WP_Query($args);
 $publications_by_year = array();
 
 if ($query->have_posts()) {
-    echo "Has posts";
     while ($query->have_posts()) {
         $query->the_post();
         $post_id = get_the_ID();
