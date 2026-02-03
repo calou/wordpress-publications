@@ -1,0 +1,54 @@
+/* WP Publications Admin - Minimal Styles */
+
+.wp-publications-progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    margin: 15px 0;
+}
+
+.wp-publications-progress-bar {
+    height: 100%;
+    background: #0073aa;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+#wp-publications-progress-text {
+    margin: 10px 0;
+}
+
+#wp-publications-results-table {
+    margin-top: 20px;
+}
+
+#wp-publications-results-table .success td {
+    background-color: #d4edda;
+}
+
+#wp-publications-results-table .error td {
+    background-color: #f8d7da;
+}
+
+.status-success {
+    color: #155724;
+}
+
+.status-error {
+    color: #721c24;
+}
+
+.error-message {
+    color: #721c24;
+    font-size: 12px;
+}
+
+.required {
+    color: #dc3232;
+}
+
+/* Select2 adjustments */
+.select2-container {
+    max-width: 100%;
+}

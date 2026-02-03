@@ -1,0 +1,97 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Update version in plugin file
+        run: |
+          sed -i "s/Version: .*/Version: ${{ steps.version.outputs.version }}/" wp-publications.php
+          sed -i "s/define('WP_PUBLICATIONS_VERSION', '.*');/define('WP_PUBLICATIONS_VERSION', '${{ steps.version.outputs.version }}');/" wp-publications.php
+      
+      - name: Create plugin archive
+        run: |
+          mkdir -p dist
+          zip -r dist/wp-publications-${{ steps.version.outputs.version }}.zip . \
+            -x "*.git*" \
+            -x "*.github*" \
+            -x "dist/*" \
+            -x "*.md" \
+            -x "*.DS_Store" \
+            -x "node_modules/*" \
+            -x "tests/*" \
+            -x "phpunit.xml" \
+            -x "composer.json" \
+            -x "composer.lock"
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wp-publications-${{ steps.version.outputs.version }}
+          path: dist/wp-publications-${{ steps.version.outputs.version }}.zip
+      
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/wp-publications-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer, cs2pr
+      
+      - name: PHP Syntax Check
+        run: |
+          find . -name "*.php" -not -path "./vendor/*" | xargs -I {} php -l {}
+      
+      - name: Check plugin structure
+        run: |
+          # Verify required files exist
+          test -f wp-publications.php || exit 1
+          test -f includes/functions.php || exit 1
+          test -f includes/crossref-api.php || exit 1
+          test -f includes/post-functions.php || exit 1
+          test -f includes/content-generator.php || exit 1
+          test -f includes/ajax-handlers.php || exit 1
+          test -f admin/admin-menu.php || exit 1
+          test -f admin/import-page.php || exit 1
+          test -f admin/settings-page.php || exit 1
+          test -f assets/js/admin.js || exit 1
+          test -f assets/css/admin.css || exit 1
+          echo "All required files present"

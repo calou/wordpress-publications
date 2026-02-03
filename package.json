@@ -1,0 +1,23 @@
+{
+  "name": "wp-publications",
+  "version": "1.0.0",
+  "description": "Fetch and display academic publications from Crossref API",
+  "main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build --webpack-copy-php --blocks-manifest --source-path=blocks",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start --webpack-copy-php --blocks-manifest --source-path=blocks"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "^15.12.0",
+		"@wordpress/blocks": "^15.12.0",
+		"@wordpress/i18n": "^6.12.0"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^31.4.0"
+	}
+}
