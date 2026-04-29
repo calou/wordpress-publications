@@ -56,10 +56,10 @@ function wp_publications_create_or_update_post($doi, $crossref_data, $journal_da
     
     // Save metadata
     update_post_meta($post_id, WP_PUBLICATIONS_META_DOI, $doi);
-    update_post_meta($post_id, WP_PUBLICATIONS_META_CROSSREF, wp_json_encode($crossref_data));
-    
+    update_post_meta($post_id, WP_PUBLICATIONS_META_CROSSREF, wp_json_encode($crossref_data, JSON_UNESCAPED_UNICODE));
+
     if (!empty($journal_data)) {
-        update_post_meta($post_id, WP_PUBLICATIONS_META_JOURNAL, wp_json_encode($journal_data));
+        update_post_meta($post_id, WP_PUBLICATIONS_META_JOURNAL, wp_json_encode($journal_data, JSON_UNESCAPED_UNICODE));
     }
     
     return $post_id;

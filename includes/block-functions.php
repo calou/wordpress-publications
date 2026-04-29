@@ -65,6 +65,10 @@ function wp_publications_block_format_apa($crossref_data, $post_id) {
         $title = is_array($message['title']) ? reset($message['title']) : $message['title'];
     }
     if (!empty($title)) {
+        // Decode any literal \uXXXX sequences that survived JSON parsing (e.g. double-escaped values).
+        $title = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/i', function ($m) {
+            return html_entity_decode('&#x' . $m[1] . ';', ENT_HTML5, 'UTF-8');
+        }, $title);
         $title_tags = array(
             'sub'    => array(),
             'sup'    => array(),
