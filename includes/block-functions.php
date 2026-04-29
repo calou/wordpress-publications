@@ -65,7 +65,15 @@ function wp_publications_block_format_apa($crossref_data, $post_id) {
         $title = is_array($message['title']) ? reset($message['title']) : $message['title'];
     }
     if (!empty($title)) {
-        $parts[] = esc_html($title) . '.';
+        $title_tags = array(
+            'sub'    => array(),
+            'sup'    => array(),
+            'i'      => array(),
+            'em'     => array(),
+            'b'      => array(),
+            'strong' => array(),
+        );
+        $parts[] = wp_kses($title, $title_tags) . '.';
     }
     
     // Journal name (italicized)
@@ -137,7 +145,7 @@ function wp_publications_block_format_apa_authors($message) {
         }
         
         if (!empty($family) && !empty($initials)) {
-            $formatted[] = esc_html($family) . ', ' . esc_html($initials);
+            $formatted[] = esc_html($family) . ' ' . esc_html($initials);
         } elseif (!empty($family)) {
             $formatted[] = esc_html($family);
         } elseif (!empty($initials)) {
