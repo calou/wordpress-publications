@@ -61,6 +61,10 @@ function wp_publications_api_section_callback() {
 
 function wp_publications_mailto_field_callback() {
     $mailto = get_option('wp_publications_mailto', '');
+    if (empty($mailto)) {
+        $current_user = wp_get_current_user();
+        $mailto = $current_user->user_email ?? '';
+    }
     ?>
     <input 
         type="email" 

@@ -11,121 +11,109 @@ if (!defined('ABSPATH')) {
  * Generate post content from Crossref data
  */
 function wp_publications_generate_content($crossref_data, $journal_data = null) {
-    $content = '';
-    
+    $blocks = array();
+
     // DOI
     $doi = isset($crossref_data['message']['DOI']) ? $crossref_data['message']['DOI'] : '';
     if (!empty($doi)) {
-        $content .= '<div class="publication-doi">';
-        $content .= '<strong>' . esc_html__('DOI:', 'wp-publications') . '</strong> ';
-        $content .= '<a href="https://doi.org/' . esc_attr($doi) . '" target="_blank" rel="noopener">';
-        $content .= esc_html($doi);
-        $content .= '</a>';
-        $content .= '</div>';
-        $content .= "\n\n";
+        $blocks[] = "<!-- wp:paragraph -->\n"
+            . '<p><strong>' . esc_html__('DOI:', 'wp-publications') . '</strong> '
+            . '<a href="' . esc_url('https://doi.org/' . $doi) . '" target="_blank" rel="noopener">' . esc_html($doi) . '</a></p>'
+            . "\n<!-- /wp:paragraph -->";
     }
-    
+
     // Journal information
     $journal_name = wp_publications_extract_journal_name($crossref_data);
     if (!empty($journal_name)) {
-        $content .= '<div class="publication-journal">';
-        
-        // Journal image if available from journal data
         $journal_image = wp_publications_get_journal_image($journal_data);
+
         if (!empty($journal_image)) {
-            $content .= '<img src="' . esc_url($journal_image) . '" alt="' . esc_attr($journal_name) . '" class="journal-image" />';
+            $blocks[] = "<!-- wp:group {\"layout\":{\"type\":\"flex\",\"flexWrap\":\"nowrap\"}} -->\n"
+                . "<div class=\"wp-block-group\">\n"
+                . "<!-- wp:image {\"sizeSlug\":\"thumbnail\"} -->\n"
+                . '<figure class="wp-block-image size-thumbnail"><img src="' . esc_url($journal_image) . '" alt="' . esc_attr($journal_name) . '"/></figure>'
+                . "\n<!-- /wp:image -->\n"
+                . "<!-- wp:paragraph -->\n"
+                . '<p><strong>' . esc_html__('Journal:', 'wp-publications') . '</strong> ' . esc_html($journal_name) . '</p>'
+                . "\n<!-- /wp:paragraph -->\n"
+                . "</div>\n<!-- /wp:group -->";
+        } else {
+            $blocks[] = "<!-- wp:paragraph -->\n"
+                . '<p><strong>' . esc_html__('Journal:', 'wp-publications') . '</strong> ' . esc_html($journal_name) . '</p>'
+                . "\n<!-- /wp:paragraph -->";
         }
-        
-        $content .= '<strong>' . esc_html__('Journal:', 'wp-publications') . '</strong> ';
-        $content .= esc_html($journal_name);
-        $content .= '</div>';
-        $content .= "\n\n";
     }
-    
+
     // Authors
     $authors = wp_publications_extract_authors($crossref_data);
     if (!empty($authors)) {
-        $content .= '<div class="publication-authors">';
-        $content .= '<strong>' . esc_html__('Authors:', 'wp-publications') . '</strong> ';
-        
-        $author_links = array();
+        $author_parts = array();
         foreach ($authors as $author) {
             $name = trim($author['given'] . ' ' . $author['family']);
-            
             if (!empty($author['orcid'])) {
                 $orcid_url = $author['orcid'];
-                // Ensure full URL
                 if (strpos($orcid_url, 'http') !== 0) {
                     $orcid_url = 'https://orcid.org/' . $orcid_url;
                 }
-                $author_links[] = '<a href="' . esc_url($orcid_url) . '" target="_blank" rel="noopener">' . esc_html($name) . '</a>';
+                $author_parts[] = '<a href="' . esc_url($orcid_url) . '" target="_blank" rel="noopener">' . esc_html($name) . '</a>';
             } else {
-                $author_links[] = esc_html($name);
+                $author_parts[] = esc_html($name);
             }
         }
-        
-        $content .= implode(', ', $author_links);
-        $content .= '</div>';
-        $content .= "\n\n";
+
+        $blocks[] = "<!-- wp:paragraph -->\n"
+            . '<p><strong>' . esc_html__('Authors:', 'wp-publications') . '</strong> ' . implode(', ', $author_parts) . '</p>'
+            . "\n<!-- /wp:paragraph -->";
     }
-    
+
     // Publication date
     $pub_date = wp_publications_format_date($crossref_data);
     if (!empty($pub_date)) {
-        $content .= '<div class="publication-date">';
-        $content .= '<strong>' . esc_html__('Published:', 'wp-publications') . '</strong> ';
-        $content .= esc_html($pub_date);
-        $content .= '</div>';
-        $content .= "\n\n";
+        $blocks[] = "<!-- wp:paragraph -->\n"
+            . '<p><strong>' . esc_html__('Published:', 'wp-publications') . '</strong> ' . esc_html($pub_date) . '</p>'
+            . "\n<!-- /wp:paragraph -->";
     }
-    
+
     // Abstract
     $abstract = wp_publications_extract_abstract($crossref_data);
     if (!empty($abstract)) {
-        $content .= '<div class="publication-abstract">';
-        $content .= '<h3>' . esc_html__('Abstract', 'wp-publications') . '</h3>';
-        $content .= '<p>' . wp_kses_post($abstract) . '</p>';
-        $content .= '</div>';
-        $content .= "\n\n";
+        $blocks[] = "<!-- wp:heading {\"level\":3} -->\n"
+            . '<h3 class="wp-block-heading">' . esc_html__('Abstract', 'wp-publications') . '</h3>'
+            . "\n<!-- /wp:heading -->";
+        $blocks[] = "<!-- wp:paragraph -->\n"
+            . '<p>' . wp_kses_post($abstract) . '</p>'
+            . "\n<!-- /wp:paragraph -->";
     }
-    
+
     // Images
     $images = wp_publications_extract_images($crossref_data);
     if (!empty($images)) {
-        $content .= '<div class="publication-images">';
-        
         if (count($images) === 1) {
-            // Single image
-            $content .= '<figure class="publication-image">';
-            $content .= '<img src="' . esc_url($images[0]) . '" alt="' . esc_attr__('Publication image', 'wp-publications') . '" />';
-            $content .= '</figure>';
+            $blocks[] = "<!-- wp:image -->\n"
+                . '<figure class="wp-block-image"><img src="' . esc_url($images[0]) . '" alt="' . esc_attr__('Publication image', 'wp-publications') . '"/></figure>'
+                . "\n<!-- /wp:image -->";
         } else {
-            // Gallery for multiple images
-            $content .= '<div class="publication-gallery">';
-            $content .= '<!-- wp:gallery {"columns":' . min(count($images), 3) . ',"linkTo":"file"} -->';
-            $content .= '<figure class="wp-block-gallery has-nested-images columns-' . min(count($images), 3) . '">';
-            
+            $cols   = min(count($images), 3);
+            $inner  = '';
             foreach ($images as $image_url) {
-                $content .= '<figure class="wp-block-image">';
-                $content .= '<a href="' . esc_url($image_url) . '" target="_blank">';
-                $content .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr__('Publication image', 'wp-publications') . '" />';
-                $content .= '</a>';
-                $content .= '</figure>';
+                $inner .= "<!-- wp:image -->\n"
+                    . '<figure class="wp-block-image"><img src="' . esc_url($image_url) . '" alt="' . esc_attr__('Publication image', 'wp-publications') . '"/></figure>'
+                    . "\n<!-- /wp:image -->\n";
             }
-            
-            $content .= '</figure>';
-            $content .= '<!-- /wp:gallery -->';
-            $content .= '</div>';
+            $blocks[] = '<!-- wp:gallery {"columns":' . $cols . ',"linkTo":"none"} -->' . "\n"
+                . '<figure class="wp-block-gallery has-nested-images columns-default is-cropped">' . "\n"
+                . $inner
+                . "</figure>\n<!-- /wp:gallery -->";
         }
-        
-        $content .= '</div>';
-        $content .= "\n\n";
     }
-    
+
     // Additional metadata
-    $content .= wp_publications_generate_metadata_section($crossref_data);
-    
-    return $content;
+    $metadata_block = wp_publications_generate_metadata_section($crossref_data);
+    if (!empty($metadata_block)) {
+        $blocks[] = $metadata_block;
+    }
+
+    return implode("\n\n", $blocks);
 }
 
 /**
@@ -227,19 +215,19 @@ function wp_publications_generate_metadata_section($crossref_data) {
         }
     }
     
-    if (!empty($metadata)) {
-        $content .= '<div class="publication-metadata">';
-        $content .= '<h3>' . esc_html__('Publication Details', 'wp-publications') . '</h3>';
-        $content .= '<dl>';
-        
-        foreach ($metadata as $label => $value) {
-            $content .= '<dt>' . esc_html($label) . '</dt>';
-            $content .= '<dd>' . wp_kses_post($value) . '</dd>';
-        }
-        
-        $content .= '</dl>';
-        $content .= '</div>';
+    if (empty($metadata)) {
+        return '';
     }
-    
-    return $content;
+
+    $rows = '';
+    foreach ($metadata as $label => $value) {
+        $rows .= '<tr><td><strong>' . esc_html($label) . '</strong></td><td>' . wp_kses_post($value) . '</td></tr>';
+    }
+
+    return "<!-- wp:heading {\"level\":3} -->\n"
+        . '<h3 class="wp-block-heading">' . esc_html__('Publication Details', 'wp-publications') . '</h3>'
+        . "\n<!-- /wp:heading -->\n\n"
+        . "<!-- wp:table -->\n"
+        . '<figure class="wp-block-table"><table><tbody>' . $rows . '</tbody></table></figure>'
+        . "\n<!-- /wp:table -->";
 }
