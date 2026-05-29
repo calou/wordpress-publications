@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress-Plugin">
+    <description>WordPress Coding Standards</description>
+    <arg name="colors"/>
+    <arg value="p"/>
+    <arg value="s"/>
+    <rule ref="WordPress-Extra"/>
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/assets/*</exclude-pattern>
+    <config name="minimum_supported_wp_version" value="7.0"/>
+</ruleset>
+
