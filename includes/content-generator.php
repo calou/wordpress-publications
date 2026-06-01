@@ -78,7 +78,7 @@ function wp_publications_generate_content( $crossref_data ) {
 			. "\n<!-- /wp:paragraph -->";
 	}
 
-	return implode( "\n\n", $blocks );
+	return implode( '', $blocks );
 }
 
 /**

@@ -78,6 +78,8 @@ function wp_publications_block_format_apa( $crossref_data, $post_id ) {
 	$message = $crossref_data['message'];
 	$parts   = array();
 
+	$parts[] = '<a href="' . get_permalink( $post_id ) . '" target="_blank" style="text-decoration:none;">';
+
 	// Authors
 	$authors = wp_publications_block_format_apa_authors( $message );
 	if ( ! empty( $authors ) ) {
@@ -112,23 +114,18 @@ function wp_publications_block_format_apa( $crossref_data, $post_id ) {
 			'b'      => array(),
 			'strong' => array(),
 		);
-		$parts[]    = '<a href="' . get_permalink( $post_id ) . '" target="_blank">';
-		$parts[]    = wp_kses( $title, $title_tags ) . '.';
-		$parts[]    = '</a>';
+		$parts[]    = '<b>' . wp_kses( $title, $title_tags ) . '.</a></b>';
 	}
 
 	// Journal name (italicized)
-	$journal = '';
-	if ( isset( $message['container-title'] ) && ! empty( $message['container-title'] ) ) {
-		$journal = is_array( $message['container-title'] ) ? reset( $message['container-title'] ) : $message['container-title'];
-	}
+	$journal = wp_publications_extract_journal_name( $crossref_data );
 	if ( ! empty( $journal ) ) {
-		$journal_part = '<em>' . esc_html( $journal ) . '</em>';
+		$journal_part = esc_html( $journal );
 
 		// Volume and issue
 		$vol_issue = '';
 		if ( isset( $message['volume'] ) ) {
-			$vol_issue = ', <em>' . esc_html( $message['volume'] ) . '</em>';
+			$vol_issue = ', ' . esc_html( $message['volume'] );
 			if ( isset( $message['issue'] ) ) {
 				$vol_issue .= '(' . esc_html( $message['issue'] ) . ')';
 			}
@@ -140,7 +137,7 @@ function wp_publications_block_format_apa( $crossref_data, $post_id ) {
 			$pages = ', ' . esc_html( $message['page'] );
 		}
 
-		$parts[] = $journal_part . $vol_issue . $pages . '.';
+		$parts[] = '<em>' . $journal_part . $vol_issue . $pages . '.' . '</em>';
 	}
 
 	// DOI

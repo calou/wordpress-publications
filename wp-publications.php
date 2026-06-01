@@ -19,7 +19,6 @@ define( 'WP_PUBLICATIONS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WP_PUBLICATIONS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WP_PUBLICATIONS_META_DOI', '_publication_doi' );
 define( 'WP_PUBLICATIONS_META_CROSSREF', '_publication_crossref_data' );
-define( 'WP_PUBLICATIONS_META_JOURNAL', '_publication_journal_data' );
 
 // Include required files
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/functions.php';

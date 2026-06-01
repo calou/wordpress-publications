@@ -23,7 +23,7 @@ $args = array(
 	'posts_per_page' => -1,
 	'meta_query'     => array(
 		array(
-			'key'     => '_publication_doi',
+			'key'     => WP_PUBLICATIONS_META_CROSSREF,
 			'compare' => 'EXISTS',
 		),
 		'orderby' => 'date',
@@ -42,30 +42,28 @@ if ( $match_all ) {
 $query                = new WP_Query( $args );
 $publications_by_year = array();
 
-if ( $query->have_posts() ) {
-	while ( $query->have_posts() ) {
-		$query->the_post();
-		$post_id = get_the_ID();
+while ( $query->have_posts() ) {
+	$query->the_post();
+	$post_id = get_the_ID();
 
-		// Get Crossref data
-		$crossref_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
-		$crossref_data = $crossref_json ? json_decode( $crossref_json, true ) : null;
+	// Get Crossref data
+	$crossref_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
+	$crossref_data = $crossref_json ? json_decode( $crossref_json, true ) : null;
 
 
-		// Extract year
-		$year = wp_publications_block_extract_year( $crossref_data );
+	// Extract year
+	$year = wp_publications_block_extract_year( $crossref_data );
 
-		if ( ! isset( $publications_by_year[ $year ] ) ) {
-			$publications_by_year[ $year ] = array();
-		}
-
-		$publications_by_year[ $year ][] = array(
-			'post_id'       => $post_id,
-			'crossref_data' => $crossref_data,
-		);
+	if ( ! isset( $publications_by_year[ $year ] ) ) {
+		$publications_by_year[ $year ] = array();
 	}
-	wp_reset_postdata();
+
+	$publications_by_year[ $year ][] = array(
+		'post_id'       => $post_id,
+		'crossref_data' => $crossref_data,
+	);
 }
+wp_reset_postdata();
 
 // Sort years descending
 krsort( $publications_by_year );
