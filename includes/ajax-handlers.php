@@ -109,19 +109,8 @@ function wp_publications_ajax_import_single() {
 
 	$crossref_data = $work_result['data'];
 
-	// Fetch journal data if ISSN is available
-	$journal_data = null;
-	$issn         = wp_publications_extract_issn( $crossref_data );
-
-	if ( ! empty( $issn ) ) {
-		$journal_result = wp_publications_fetch_crossref_journal( $issn, $mailto );
-		if ( $journal_result['success'] ) {
-			$journal_data = $journal_result['data'];
-		}
-	}
-
 	// Create or update post
-	$post_id = wp_publications_create_or_update_post( $doi, $crossref_data, $journal_data, $tag_ids );
+	$post_id = wp_publications_create_or_update_post( $doi, $crossref_data, $tag_ids );
 
 	if ( is_wp_error( $post_id ) ) {
 		wp_send_json_error(

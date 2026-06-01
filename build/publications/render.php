@@ -26,6 +26,8 @@ $args = array(
 			'key'     => '_publication_doi',
 			'compare' => 'EXISTS',
 		),
+		'orderby' => 'date',
+		'order'   => 'DESC',
 	),
 );
 
@@ -46,7 +48,7 @@ if ( $query->have_posts() ) {
 		$post_id = get_the_ID();
 
 		// Get Crossref data
-		$crossref_json = get_post_meta( $post_id, '_publication_crossref_data', true );
+		$crossref_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
 		$crossref_data = $crossref_json ? json_decode( $crossref_json, true ) : null;
 
 

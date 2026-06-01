@@ -10,38 +10,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Generate post content from Crossref data
  */
-function wp_publications_generate_content( $crossref_data, $journal_data = null ) {
+function wp_publications_generate_content( $crossref_data ) {
 	$blocks = array();
 
-	// DOI
-	$doi = isset( $crossref_data['message']['DOI'] ) ? $crossref_data['message']['DOI'] : '';
-	if ( ! empty( $doi ) ) {
+	// Publication date
+	$pub_date = wp_publications_format_date( $crossref_data );
+	if ( ! empty( $pub_date ) ) {
 		$blocks[] = "<!-- wp:paragraph -->\n"
-			. '<p><strong>' . esc_html__( 'DOI:', 'wp-publications' ) . '</strong> '
-			. '<a href="' . esc_url( 'https://doi.org/' . $doi ) . '" target="_blank" rel="noopener">' . esc_html( $doi ) . '</a></p>'
+			. '<p>' . esc_html( $pub_date ) . '</p>'
 			. "\n<!-- /wp:paragraph -->";
 	}
 
-	// Journal information
-	$journal_name = wp_publications_extract_journal_name( $crossref_data );
-	if ( ! empty( $journal_name ) ) {
-		$journal_image = wp_publications_get_journal_image( $journal_data );
+	// Volume/Issue/Page
+	$citation_parts = array();
+	if ( isset( $crossref_data['message']['publisher'] ) ) {
+		$citation_parts[] = $crossref_data['message']['publisher'];
+	}
+	if ( isset( $crossref_data['message']['volume'] ) ) {
+		$citation_parts[] = __( 'Vol.', 'wp-publications' ) . ' ' . $crossref_data['message']['volume'];
+	}
+	if ( isset( $crossref_data['message']['issue'] ) ) {
+		$citation_parts[] = __( 'Issue', 'wp-publications' ) . ' ' . $crossref_data['message']['issue'];
+	}
+	if ( isset( $crossref_data['message']['page'] ) ) {
+		$citation_parts[] = __( 'pp.', 'wp-publications' ) . ' ' . $crossref_data['message']['page'];
+	}
 
-		if ( ! empty( $journal_image ) ) {
-			$blocks[] = "<!-- wp:group {\"layout\":{\"type\":\"flex\",\"flexWrap\":\"nowrap\"}} -->\n"
-				. "<div class=\"wp-block-group\">\n"
-				. "<!-- wp:image {\"sizeSlug\":\"thumbnail\"} -->\n"
-				. '<figure class="wp-block-image size-thumbnail"><img src="' . esc_url( $journal_image ) . '" alt="' . esc_attr( $journal_name ) . '"/></figure>'
-				. "\n<!-- /wp:image -->\n"
-				. "<!-- wp:paragraph -->\n"
-				. '<p><strong>' . esc_html__( 'Journal:', 'wp-publications' ) . '</strong> ' . esc_html( $journal_name ) . '</p>'
-				. "\n<!-- /wp:paragraph -->\n"
-				. "</div>\n<!-- /wp:group -->";
-		} else {
-			$blocks[] = "<!-- wp:paragraph -->\n"
-				. '<p><strong>' . esc_html__( 'Journal:', 'wp-publications' ) . '</strong> ' . esc_html( $journal_name ) . '</p>'
-				. "\n<!-- /wp:paragraph -->";
-		}
+	$doi = isset( $crossref_data['message']['DOI'] ) ? $crossref_data['message']['DOI'] : '';
+	if ( ! empty( $doi ) ) {
+			$citation_parts[] = '<a href="' . esc_url( 'https://doi.org/' . $doi ) . '" target="_blank" rel="noopener">' . esc_html( $doi ) . '</a></p>';
+	}
+
+	if ( ! empty( $citation_parts ) ) {
+		$blocks[] = "<!-- wp:paragraph -->\n<p>" . implode( ', ', $citation_parts ) . "\n<!-- /wp:paragraph -->";
 	}
 
 	// Authors
@@ -62,15 +63,7 @@ function wp_publications_generate_content( $crossref_data, $journal_data = null 
 		}
 
 		$blocks[] = "<!-- wp:paragraph -->\n"
-			. '<p><strong>' . esc_html__( 'Authors:', 'wp-publications' ) . '</strong> ' . implode( ', ', $author_parts ) . '</p>'
-			. "\n<!-- /wp:paragraph -->";
-	}
-
-	// Publication date
-	$pub_date = wp_publications_format_date( $crossref_data );
-	if ( ! empty( $pub_date ) ) {
-		$blocks[] = "<!-- wp:paragraph -->\n"
-			. '<p><strong>' . esc_html__( 'Published:', 'wp-publications' ) . '</strong> ' . esc_html( $pub_date ) . '</p>'
+			. '<p>' . implode( ', ', $author_parts ) . '</p>'
 			. "\n<!-- /wp:paragraph -->";
 	}
 
@@ -83,34 +76,6 @@ function wp_publications_generate_content( $crossref_data, $journal_data = null 
 		$blocks[] = "<!-- wp:paragraph -->\n"
 			. '<p>' . wp_kses_post( $abstract ) . '</p>'
 			. "\n<!-- /wp:paragraph -->";
-	}
-
-	// Images
-	$images = wp_publications_extract_images( $crossref_data );
-	if ( ! empty( $images ) ) {
-		if ( count( $images ) === 1 ) {
-			$blocks[] = "<!-- wp:image -->\n"
-				. '<figure class="wp-block-image"><img src="' . esc_url( $images[0] ) . '" alt="' . esc_attr__( 'Publication image', 'wp-publications' ) . '"/></figure>'
-				. "\n<!-- /wp:image -->";
-		} else {
-			$cols  = min( count( $images ), 3 );
-			$inner = '';
-			foreach ( $images as $image_url ) {
-				$inner .= "<!-- wp:image -->\n"
-					. '<figure class="wp-block-image"><img src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'Publication image', 'wp-publications' ) . '"/></figure>'
-					. "\n<!-- /wp:image -->\n";
-			}
-			$blocks[] = '<!-- wp:gallery {"columns":' . $cols . ',"linkTo":"none"} -->' . "\n"
-				. '<figure class="wp-block-gallery has-nested-images columns-default is-cropped">' . "\n"
-				. $inner
-				. "</figure>\n<!-- /wp:gallery -->";
-		}
-	}
-
-	// Additional metadata
-	$metadata_block = wp_publications_generate_metadata_section( $crossref_data );
-	if ( ! empty( $metadata_block ) ) {
-		$blocks[] = $metadata_block;
 	}
 
 	return implode( "\n\n", $blocks );
@@ -165,69 +130,4 @@ function wp_publications_get_journal_image( $journal_data ) {
 	}
 
 	return '';
-}
-
-/**
- * Generate additional metadata section
- */
-function wp_publications_generate_metadata_section( $crossref_data ) {
-	$content  = '';
-	$metadata = array();
-
-	// Type
-	if ( isset( $crossref_data['message']['type'] ) ) {
-		$metadata[ __( 'Type', 'wp-publications' ) ] = ucfirst( str_replace( '-', ' ', $crossref_data['message']['type'] ) );
-	}
-
-	// Volume/Issue/Page
-	$citation_parts = array();
-	if ( isset( $crossref_data['message']['volume'] ) ) {
-		$citation_parts[] = __( 'Vol.', 'wp-publications' ) . ' ' . $crossref_data['message']['volume'];
-	}
-	if ( isset( $crossref_data['message']['issue'] ) ) {
-		$citation_parts[] = __( 'Issue', 'wp-publications' ) . ' ' . $crossref_data['message']['issue'];
-	}
-	if ( isset( $crossref_data['message']['page'] ) ) {
-		$citation_parts[] = __( 'pp.', 'wp-publications' ) . ' ' . $crossref_data['message']['page'];
-	}
-	if ( ! empty( $citation_parts ) ) {
-		$metadata[ __( 'Citation', 'wp-publications' ) ] = implode( ', ', $citation_parts );
-	}
-
-	// Publisher
-	if ( isset( $crossref_data['message']['publisher'] ) ) {
-		$metadata[ __( 'Publisher', 'wp-publications' ) ] = $crossref_data['message']['publisher'];
-	}
-
-	// ISSN
-	if ( isset( $crossref_data['message']['ISSN'] ) && ! empty( $crossref_data['message']['ISSN'] ) ) {
-		$issns                                       = is_array( $crossref_data['message']['ISSN'] )
-			? implode( ', ', $crossref_data['message']['ISSN'] )
-			: $crossref_data['message']['ISSN'];
-		$metadata[ __( 'ISSN', 'wp-publications' ) ] = $issns;
-	}
-
-	// License
-	if ( isset( $crossref_data['message']['license'] ) && ! empty( $crossref_data['message']['license'] ) ) {
-		$license = reset( $crossref_data['message']['license'] );
-		if ( isset( $license['URL'] ) ) {
-			$metadata[ __( 'License', 'wp-publications' ) ] = '<a href="' . esc_url( $license['URL'] ) . '" target="_blank" rel="noopener">' . esc_html( $license['URL'] ) . '</a>';
-		}
-	}
-
-	if ( empty( $metadata ) ) {
-		return '';
-	}
-
-	$rows = '';
-	foreach ( $metadata as $label => $value ) {
-		$rows .= '<tr><td><strong>' . esc_html( $label ) . '</strong></td><td>' . wp_kses_post( $value ) . '</td></tr>';
-	}
-
-	return "<!-- wp:heading {\"level\":3} -->\n"
-		. '<h3 class="wp-block-heading">' . esc_html__( 'Publication Details', 'wp-publications' ) . '</h3>'
-		. "\n<!-- /wp:heading -->\n\n"
-		. "<!-- wp:table -->\n"
-		. '<figure class="wp-block-table"><table><tbody>' . $rows . '</tbody></table></figure>'
-		. "\n<!-- /wp:table -->";
 }

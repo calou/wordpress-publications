@@ -2,32 +2,36 @@
 // This file is generated. Do not modify it manually.
 return array(
 	'publications' => array(
-		'$schema'      => 'https://schemas.wp.org/trunk/block.json',
-		'apiVersion'   => 3,
-		'name'         => 'create-block/publications',
-		'version'      => '0.1.0',
-		'title'        => 'publications',
-		'category'     => 'widgets',
-		'icon'         => 'smiley',
-		'description'  => 'List of publications',
-		'example'      => array(),
-		'supports'     => array(
-			'html' => false,
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'apiVersion' => 3,
+		'name' => 'create-block/publications',
+		'version' => '0.1.0',
+		'title' => 'publications',
+		'category' => 'widgets',
+		'icon' => 'smiley',
+		'description' => 'List of publications',
+		'example' => array(
+			
 		),
-		'attributes'   => array(
+		'supports' => array(
+			'html' => false
+		),
+		'attributes' => array(
 			'selectedTags' => array(
-				'type'    => 'array',
-				'default' => array(),
+				'type' => 'array',
+				'default' => array(
+					
+				)
 			),
 			'matchAllTags' => array(
-				'type'    => 'boolean',
-				'default' => 'false',
-			),
+				'type' => 'boolean',
+				'default' => 'false'
+			)
 		),
-		'textdomain'   => 'publications',
+		'textdomain' => 'publications',
 		'editorScript' => 'file:./index.js',
-		'editorStyle'  => 'file:./index.css',
-		'style'        => 'file:./style-index.css',
-		'render'       => 'file:./render.php',
-	),
+		'editorStyle' => 'file:./index.css',
+		'style' => 'file:./style-index.css',
+		'render' => 'file:./render.php'
+	)
 );

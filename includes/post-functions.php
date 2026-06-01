@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Create or update a publication post
  */
-function wp_publications_create_or_update_post( $doi, $crossref_data, $journal_data, $tag_ids = array() ) {
+function wp_publications_create_or_update_post( $doi, $crossref_data, $tag_ids = array() ) {
 	$doi           = wp_publications_normalize_doi( $doi );
 	$existing_post = wp_publications_find_by_doi( $doi );
 
@@ -18,7 +18,7 @@ function wp_publications_create_or_update_post( $doi, $crossref_data, $journal_d
 	$title = wp_publications_extract_title( $crossref_data );
 
 	// Generate content
-	$content = wp_publications_generate_content( $crossref_data, $journal_data );
+	$content = wp_publications_generate_content( $crossref_data );
 
 	$post_data = array(
 		'post_title'   => $title,
@@ -58,10 +58,6 @@ function wp_publications_create_or_update_post( $doi, $crossref_data, $journal_d
 	// Save metadata
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_DOI, $doi );
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, wp_json_encode( $crossref_data, JSON_UNESCAPED_UNICODE ) );
-
-	if ( ! empty( $journal_data ) ) {
-		update_post_meta( $post_id, WP_PUBLICATIONS_META_JOURNAL, wp_json_encode( $journal_data, JSON_UNESCAPED_UNICODE ) );
-	}
 
 	return $post_id;
 }
