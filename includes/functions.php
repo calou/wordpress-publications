@@ -18,7 +18,7 @@ function wp_publications_get_mailto() {
  * Get the API delay in milliseconds
  */
 function wp_publications_get_api_delay() {
-	return (int) get_option( 'wp_publications_api_delay', 1000 );
+	return (int) get_option( 'wp_publications_api_delay', 200 );
 }
 
 /**

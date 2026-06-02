@@ -3,6 +3,8 @@
  * Block registration and helper functions
  */
 
+use BcMath\Number;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -58,7 +60,6 @@ function wp_publications_block_format_apa( array $data, $post_id ) {
 		$parts[]    = '<b>' . wp_kses( $title, $title_tags ) . '.</a></b>';
 	}
 
-	// Journal name (italicized)
 	$journal = $data['primary_location']['raw_source_name'];
 	if ( ! empty( $journal ) ) {
 		$journal_part = esc_html( $journal );
@@ -88,7 +89,7 @@ function wp_publications_block_format_apa( array $data, $post_id ) {
  * Format authors in APA style
  * APA: Last, F. M., Last, F. M., & Last, F. M.
  */
-function wp_publications_block_format_apa_authors( $data ) {
+function wp_publications_block_format_apa_authors( array $data ) {
 	$authors   = $data['authorships'];
 	$formatted = array();
 

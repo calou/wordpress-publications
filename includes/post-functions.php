@@ -58,7 +58,7 @@ function wp_publications_create_or_update_post( $doi, $data, $tag_ids = array() 
 	// Save metadata
 	update_post_meta( $post_id, '_wp_page_template', 'single-publication' );
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_DOI, $doi );
-	update_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, wp_json_encode( $data, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
+	update_post_meta( $post_id, WP_PUBLICATIONS_META_DATA, wp_json_encode( $data, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
 
 	return $post_id;
 }

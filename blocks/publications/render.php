@@ -23,7 +23,7 @@ $args = array(
 	'posts_per_page' => -1,
 	'meta_query'     => array(
 		array(
-			'key'     => WP_PUBLICATIONS_META_CROSSREF,
+			'key'     => WP_PUBLICATIONS_META_DATA,
 			'compare' => 'EXISTS',
 		),
 		'orderby' => 'date',
@@ -47,7 +47,7 @@ while ( $query->have_posts() ) {
 	$post_id = get_the_ID();
 
 	// Get Crossref data
-	$json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
+	$json = get_post_meta( $post_id, WP_PUBLICATIONS_META_DATA, true );
 	$data = $json ? json_decode( $json, true ) : null;
 
 
