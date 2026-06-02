@@ -95,6 +95,8 @@ function wp_publications_ajax_import_single() {
 		);
 	}
 
+	$existing = wp_publications_find_by_doi( $doi );
+
 	// Fetch work data from Crossref
 	$work_result = wp_publications_fetch_crossref_work( $doi, $mailto );
 
@@ -121,11 +123,8 @@ function wp_publications_ajax_import_single() {
 		);
 	}
 
-	// Check if it was an update or create
-	$existing = wp_publications_find_by_doi( $doi );
-	$action   = ( $existing && $existing->ID === $post_id ) ? 'updated' : 'created';
-
-	$title = wp_publications_extract_title( $crossref_data );
+	$action = ( $existing && $existing->ID === $post_id ) ? 'updated' : 'created';
+	$title  = wp_publications_extract_title( $crossref_data );
 
 	wp_send_json_success(
 		array(
