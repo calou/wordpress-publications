@@ -16,87 +16,28 @@ function wp_publications_register_block() {
 		wp_register_block_types_from_metadata_collection( WP_PUBLICATIONS_PLUGIN_DIR . '/build', WP_PUBLICATIONS_PLUGIN_DIR . '/build/blocks-manifest.php' );
 }
 
-/**
- * Extract publication year from Crossref data
- */
-function wp_publications_block_extract_year( $crossref_data ) {
-	if ( ! $crossref_data || ! isset( $crossref_data['message'] ) ) {
-		return __( 'Unknown', 'wp-publications' );
-	}
-
-	$date_fields = array( 'published-print', 'published-online', 'issued', 'created' );
-
-	foreach ( $date_fields as $field ) {
-		if ( isset( $crossref_data['message'][ $field ]['date-parts'][0][0] ) ) {
-			return (string) $crossref_data['message'][ $field ]['date-parts'][0][0];
-		}
-	}
-
-	return __( 'Unknown', 'wp-publications' );
-}
-
-/**
- * Extract full publication date from Crossref data
- */
-function wp_publications_block_extract_full_date( $crossref_data ) {
-	if ( ! $crossref_data || ! isset( $crossref_data['message'] ) ) {
-		return __( 'Unknown', 'wp-publications' );
-	}
-	$date_fields = array( 'published-print', 'published-online', 'issued', 'created' );
-
-	foreach ( $date_fields as $field ) {
-		if ( isset( $crossref_data['message'][ $field ]['date-parts'][0] ) ) {
-			$date_parts = $crossref_data['message'][ $field ]['date-parts'][0];
-
-			// Full date (year, month, day)
-			if ( isset( $date_parts[0], $date_parts[1], $date_parts[2] ) ) {
-				return sprintf( '%04d-%02d-%02d', $date_parts[0], $date_parts[1], $date_parts[2] );
-			}
-			// Partial date (year, month)
-			elseif ( isset( $date_parts[0], $date_parts[1] ) ) {
-				return sprintf( '%04d-%02d-01', $date_parts[0], $date_parts[1] );
-			}
-			// Year only
-			elseif ( isset( $date_parts[0] ) ) {
-				return sprintf( '%04d-01-01', $date_parts[0] );
-			}
-		}
-	}
-	return __( 'Unknown', 'wp-publications' );
-}
-
 
 /**
  * Format publication in APA style
  * APA format: Author, A. A., Author, B. B., & Author, C. C. (Year). Title of article. Title of Periodical, volume(issue), page–page. https://doi.org/xxxxx
  */
-function wp_publications_block_format_apa( $crossref_data, $post_id ) {
-	if ( ! $crossref_data || ! isset( $crossref_data['message'] ) ) {
-		return esc_html( get_the_title( $post_id ) );
-	}
-
-	$message = $crossref_data['message'];
-	$parts   = array();
+function wp_publications_block_format_apa( array $data, $post_id ) {
+	$parts = array();
 
 	$parts[] = '<a href="' . get_permalink( $post_id ) . '" target="_blank" style="text-decoration:none;">';
 
 	// Authors
-	$authors = wp_publications_block_format_apa_authors( $message );
+	$authors = wp_publications_block_format_apa_authors( $data );
 	if ( ! empty( $authors ) ) {
 		$parts[] = $authors;
 	}
 
 	// Year
-	$year = wp_publications_block_extract_year( $crossref_data );
-	if ( $year !== __( 'Unknown', 'wp-publications' ) ) {
-		$parts[] = '(' . $year . ').';
-	}
+	$year    = $data['publication_year'];
+	$parts[] = '(' . $year . ').';
 
 	// Title
-	$title = '';
-	if ( isset( $message['title'] ) && ! empty( $message['title'] ) ) {
-		$title = is_array( $message['title'] ) ? reset( $message['title'] ) : $message['title'];
-	}
+	$title = $data['title'];
 	if ( ! empty( $title ) ) {
 		// Decode any literal \uXXXX sequences that survived JSON parsing (e.g. double-escaped values).
 		$title      = preg_replace_callback(
@@ -118,33 +59,26 @@ function wp_publications_block_format_apa( $crossref_data, $post_id ) {
 	}
 
 	// Journal name (italicized)
-	$journal = wp_publications_extract_journal_name( $crossref_data );
+	$journal = $data['primary_location']['raw_source_name'];
 	if ( ! empty( $journal ) ) {
 		$journal_part = esc_html( $journal );
 
 		// Volume and issue
 		$vol_issue = '';
-		if ( isset( $message['volume'] ) ) {
-			$vol_issue = ', ' . esc_html( $message['volume'] );
-			if ( isset( $message['issue'] ) ) {
-				$vol_issue .= '(' . esc_html( $message['issue'] ) . ')';
+		if ( isset( $data['biblio']['volume'] ) ) {
+			$vol_issue = ', ' . esc_html( $data['biblio']['volume'] );
+			if ( isset( $data['biblio']['issue'] ) ) {
+				$vol_issue .= '(' . esc_html( $data['biblio']['issue'] ) . ')';
 			}
 		}
 
-		// Pages
-		$pages = '';
-		if ( isset( $message['page'] ) ) {
-			$pages = ', ' . esc_html( $message['page'] );
-		}
-
-		$parts[] = '<em>' . $journal_part . $vol_issue . $pages . '.' . '</em>';
+		$parts[] = '<em>' . $journal_part . $vol_issue . '.' . '</em>';
 	}
 
 	// DOI
-	if ( isset( $message['DOI'] ) ) {
-		$doi     = $message['DOI'];
-		$doi_url = 'https://doi.org/' . $doi;
-		$parts[] = '<a href="' . esc_url( $doi_url ) . '" target="_blank" rel="noopener">' . esc_url( $doi_url ) . '</a>';
+	if ( isset( $data['doi'] ) ) {
+		$doi     = $data['doi'];
+		$parts[] = '<a href="' . esc_url( $doi ) . '" target="_blank" rel="noopener">' . esc_url( $doi ) . '</a>';
 	}
 
 	return implode( ' ', $parts );
@@ -154,41 +88,12 @@ function wp_publications_block_format_apa( $crossref_data, $post_id ) {
  * Format authors in APA style
  * APA: Last, F. M., Last, F. M., & Last, F. M.
  */
-function wp_publications_block_format_apa_authors( $message ) {
-	if ( ! isset( $message['author'] ) || empty( $message['author'] ) ) {
-		return '';
-	}
-
-	$authors   = $message['author'];
+function wp_publications_block_format_apa_authors( $data ) {
+	$authors   = $data['authorships'];
 	$formatted = array();
 
 	foreach ( $authors as $author ) {
-		$family = isset( $author['family'] ) ? $author['family'] : '';
-		$given  = isset( $author['given'] ) ? $author['given'] : '';
-
-		if ( empty( $family ) && empty( $given ) ) {
-			continue;
-		}
-
-		// Format given name as initials
-		$initials = '';
-		if ( ! empty( $given ) ) {
-			$given_parts = preg_split( '/[\s\-]+/', $given );
-			foreach ( $given_parts as $part ) {
-				if ( ! empty( $part ) ) {
-					$initials .= mb_strtoupper( mb_substr( $part, 0, 1 ) ) . '. ';
-				}
-			}
-			$initials = trim( $initials );
-		}
-
-		if ( ! empty( $family ) && ! empty( $initials ) ) {
-			$formatted[] = esc_html( $family ) . ' ' . esc_html( $initials );
-		} elseif ( ! empty( $family ) ) {
-			$formatted[] = esc_html( $family );
-		} elseif ( ! empty( $initials ) ) {
-			$formatted[] = esc_html( $initials );
-		}
+		$formatted[] = $author['author']['display_name'];
 	}
 
 	if ( empty( $formatted ) ) {
@@ -204,6 +109,6 @@ function wp_publications_block_format_apa_authors( $message ) {
 	} else {
 		// For 3+ authors, list all with commas and & before the last
 		$last = array_pop( $formatted );
-		return implode( ', ', $formatted ) . ', & ' . $last;
+		return implode( ', ', $formatted ) . ' & ' . $last;
 	}
 }

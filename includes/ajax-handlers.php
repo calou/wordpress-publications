@@ -98,7 +98,7 @@ function wp_publications_ajax_import_single() {
 	$existing = wp_publications_find_by_doi( $doi );
 
 	// Fetch work data from Crossref
-	$work_result = wp_publications_fetch_crossref_work( $doi, $mailto );
+	$work_result = wp_publications_fetch_openalex_work( $doi, $mailto );
 
 	if ( ! $work_result['success'] ) {
 		wp_send_json_error(
@@ -109,10 +109,10 @@ function wp_publications_ajax_import_single() {
 		);
 	}
 
-	$crossref_data = $work_result['data'];
+	$data = $work_result['data'];
 
 	// Create or update post
-	$post_id = wp_publications_create_or_update_post( $doi, $crossref_data, $tag_ids );
+	$post_id = wp_publications_create_or_update_post( $doi, $data, $tag_ids );
 
 	if ( is_wp_error( $post_id ) ) {
 		wp_send_json_error(
@@ -124,7 +124,7 @@ function wp_publications_ajax_import_single() {
 	}
 
 	$action = ( $existing && $existing->ID === $post_id ) ? 'updated' : 'created';
-	$title  = wp_publications_extract_title( $crossref_data );
+	$title  = $data['title'];
 
 	wp_send_json_success(
 		array(

@@ -18,11 +18,11 @@ define( 'WP_PUBLICATIONS_VERSION', '1.0.0' );
 define( 'WP_PUBLICATIONS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WP_PUBLICATIONS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WP_PUBLICATIONS_META_DOI', '_publication_doi' );
-define( 'WP_PUBLICATIONS_META_CROSSREF', '_publication_crossref_data' );
+define( 'WP_PUBLICATIONS_META_CROSSREF', '_publication_data' );
 
 // Include required files
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/functions.php';
-require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/crossref-api.php';
+require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/openalex-api.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/post-functions.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/content-generator.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/ajax-handlers.php';

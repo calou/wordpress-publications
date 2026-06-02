@@ -47,20 +47,20 @@ while ( $query->have_posts() ) {
 	$post_id = get_the_ID();
 
 	// Get Crossref data
-	$crossref_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
-	$crossref_data = $crossref_json ? json_decode( $crossref_json, true ) : null;
+	$json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
+	$data = $json ? json_decode( $json, true ) : null;
 
 
 	// Extract year
-	$year = wp_publications_block_extract_year( $crossref_data );
+	$year = $data['publication_year'];
 
 	if ( ! isset( $publications_by_year[ $year ] ) ) {
 		$publications_by_year[ $year ] = array();
 	}
 
 	$publications_by_year[ $year ][] = array(
-		'post_id'       => $post_id,
-		'crossref_data' => $crossref_data,
+		'post_id' => $post_id,
+		'data'    => $data,
 	);
 }
 wp_reset_postdata();
@@ -85,7 +85,7 @@ ob_start();
 				<ol class="wp-publications-list">
 					<?php foreach ( $publications as $pub ) : ?>
 						<li class="wp-publications-item">
-							<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+							<?php echo wp_publications_block_format_apa( $pub['data'], $pub['post_id'] ); ?>
 						</li>
 					<?php endforeach; ?>
 				</ol>
@@ -95,3 +95,4 @@ ob_start();
 </div>
 <?php
 return ob_end_flush();
+
