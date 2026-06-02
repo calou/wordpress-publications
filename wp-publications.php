@@ -27,6 +27,7 @@ require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/post-functions.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/content-generator.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/ajax-handlers.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/block-functions.php';
+require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/template-loader.php';
 
 if ( is_admin() ) {
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/admin-menu.php';

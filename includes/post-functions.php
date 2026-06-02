@@ -56,6 +56,7 @@ function wp_publications_create_or_update_post( $doi, $crossref_data, $tag_ids =
 	}
 
 	// Save metadata
+	update_post_meta( $post_id, '_wp_page_template', 'single-publication' );
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_DOI, $doi );
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, wp_json_encode( $crossref_data, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
 
