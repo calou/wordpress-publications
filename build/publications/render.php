@@ -40,8 +40,10 @@ if ( $match_all ) {
 	$args['tag__in'] = $selected_tags;
 }
 
-$query                = new WP_Query( $args );
-$publications_by_year = array();
+$query                 = new WP_Query( $args );
+$publications_by_year  = array();
+$unknown_publications  = array();
+$unknown_label         = __( 'Unknown', 'wp-publications' );
 
 while ( $query->have_posts() ) {
 	$query->the_post();
@@ -51,22 +53,27 @@ while ( $query->have_posts() ) {
 	$crossref_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
 	$crossref_data = $crossref_json ? json_decode( $crossref_json, true ) : null;
 
-
 	// Extract year
 	$year = wp_publications_block_extract_year( $crossref_data );
 
-	if ( ! isset( $publications_by_year[ $year ] ) ) {
-		$publications_by_year[ $year ] = array();
-	}
-
-	$publications_by_year[ $year ][] = array(
+	$publication = array(
 		'post_id'       => $post_id,
 		'crossref_data' => $crossref_data,
 	);
+
+	if ( $year === $unknown_label ) {
+		// Publications without a known year are grouped at the end of the list.
+		$unknown_publications[] = $publication;
+	} else {
+		if ( ! isset( $publications_by_year[ $year ] ) ) {
+			$publications_by_year[ $year ] = array();
+		}
+		$publications_by_year[ $year ][] = $publication;
+	}
 }
 wp_reset_postdata();
 
-// Sort years descending
+// Sort known years descending.
 krsort( $publications_by_year );
 
 // Build output
@@ -75,7 +82,7 @@ $wrapper_attributes = get_block_wrapper_attributes();
 ob_start();
 ?>
 <div <?php echo $wrapper_attributes; ?>>
-	<?php if ( empty( $publications_by_year ) ) : ?>
+	<?php if ( empty( $publications_by_year ) && empty( $unknown_publications ) ) : ?>
 		<p class="wp-publications-no-results">
 			<?php esc_html_e( 'No publications found.', 'wp-publications' ); ?>
 		</p>
@@ -84,6 +91,7 @@ ob_start();
 			<div class="wp-publications-content">
 				<?php foreach ( $publications_by_year as $year => $publications ) : ?>
 					<div id="wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-year-group">
+						<h3 class="wp-publications-year-heading"><?php echo esc_html( $year ); ?></h3>
 						<ol class="wp-publications-list">
 							<?php foreach ( $publications as $pub ) : ?>
 								<li class="wp-publications-item">
@@ -93,6 +101,19 @@ ob_start();
 						</ol>
 					</div>
 				<?php endforeach; ?>
+
+				<?php if ( ! empty( $unknown_publications ) ) : ?>
+					<div id="wp-publications-unknown-year" class="wp-publications-year-group wp-publications-year-group-unknown">
+						<h3 class="wp-publications-year-heading"><?php echo esc_html( $unknown_label ); ?></h3>
+						<ol class="wp-publications-list">
+							<?php foreach ( $unknown_publications as $pub ) : ?>
+								<li class="wp-publications-item">
+									<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+								</li>
+							<?php endforeach; ?>
+						</ol>
+					</div>
+				<?php endif; ?>
 			</div>
 
 			<?php if ( $show_timeline && count( $publications_by_year ) > 1 ) : ?>
