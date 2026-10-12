@@ -34,6 +34,10 @@ return array(
 			'showYearHeadings' => array(
 				'type' => 'boolean',
 				'default' => true
+			),
+			'maxPublications' => array(
+				'type' => 'number',
+				'default' => 0
 			)
 		),
 		'textdomain' => 'publications',

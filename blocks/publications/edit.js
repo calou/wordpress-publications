@@ -1,10 +1,10 @@
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, Spinner, ToggleControl } from '@wordpress/components';
+import { PanelBody, Spinner, ToggleControl, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings } = attributes;
+    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings, maxPublications } = attributes;
 
     // Fetch all available tags
     const { tags, isLoading } = useSelect((select) => {
@@ -75,6 +75,17 @@ export default function Edit({ attributes, setAttributes }) {
                                 checked={showYearHeadings}
                                 onChange={(value) => setAttributes({ showYearHeadings: value })}
                             />
+                            <TextControl
+                                label="Max publications"
+                                type="number"
+                                min={0}
+                                value={maxPublications}
+                                onChange={(value) => setAttributes({ maxPublications: parseInt(value, 10) || 0 })}
+                                help={maxPublications > 0
+                                    ? `Show at most ${maxPublications} publications (most recent first)`
+                                    : 'Show all publications'
+                                }
+                            />
                         </>
                     )}
                 </PanelBody>
@@ -94,6 +105,9 @@ export default function Edit({ attributes, setAttributes }) {
                 </p>
                 <p>
                     <em>Year headings: {showYearHeadings ? 'shown' : 'hidden'}</em>
+                </p>
+                <p>
+                    <em>Max publications: {maxPublications > 0 ? maxPublications : 'all'}</em>
                 </p>
             </div>
         </>
