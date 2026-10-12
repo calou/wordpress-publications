@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings, maxPublications } = attributes;
+    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings, maxPublications, showFeaturedImage } = attributes;
 
     // Fetch all available tags
     const { tags, isLoading } = useSelect((select) => {
@@ -86,6 +86,12 @@ export default function Edit({ attributes, setAttributes }) {
                                     : 'Show all publications'
                                 }
                             />
+                            <ToggleControl
+                                label="Show featured image"
+                                help={"Display the featured image on the left of the publication text when available"}
+                                checked={showFeaturedImage}
+                                onChange={(value) => setAttributes({ showFeaturedImage: value })}
+                            />
                         </>
                     )}
                 </PanelBody>
@@ -108,6 +114,9 @@ export default function Edit({ attributes, setAttributes }) {
                 </p>
                 <p>
                     <em>Max publications: {maxPublications > 0 ? maxPublications : 'all'}</em>
+                </p>
+                <p>
+                    <em>Featured image: {showFeaturedImage ? 'shown' : 'hidden'}</em>
                 </p>
             </div>
         </>

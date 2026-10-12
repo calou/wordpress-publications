@@ -18,6 +18,7 @@ $match_all     = $attributes['matchAllTags'] ?? false;
 $show_timeline = $attributes['showYearTimeline'] ?? true;
 $show_headings = $attributes['showYearHeadings'] ?? true;
 $max_publications = isset( $attributes['maxPublications'] ) ? max( 0, (int) $attributes['maxPublications'] ) : 0;
+$show_featured_image = $attributes['showFeaturedImage'] ?? false;
 
 // Build query args
 $args = array(
@@ -98,8 +99,15 @@ ob_start();
 						<?php endif; ?>
 						<ol class="wp-publications-list">
 							<?php foreach ( $publications as $pub ) : ?>
-								<li class="wp-publications-item">
-									<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+								<li class="wp-publications-item<?php echo ( $show_featured_image && has_post_thumbnail( $pub['post_id'] ) ) ? ' has-featured-image' : ''; ?>">
+									<?php if ( $show_featured_image && has_post_thumbnail( $pub['post_id'] ) ) : ?>
+										<div class="wp-publications-featured-image">
+											<?php echo get_the_post_thumbnail( $pub['post_id'], 'thumbnail', array( 'class' => 'wp-publications-thumb' ) ); ?>
+										</div>
+									<?php endif; ?>
+									<div class="wp-publications-text">
+										<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+									</div>
 								</li>
 							<?php endforeach; ?>
 						</ol>
@@ -113,8 +121,15 @@ ob_start();
 						<?php endif; ?>
 						<ol class="wp-publications-list">
 							<?php foreach ( $unknown_publications as $pub ) : ?>
-								<li class="wp-publications-item">
-									<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+								<li class="wp-publications-item<?php echo ( $show_featured_image && has_post_thumbnail( $pub['post_id'] ) ) ? ' has-featured-image' : ''; ?>">
+									<?php if ( $show_featured_image && has_post_thumbnail( $pub['post_id'] ) ) : ?>
+										<div class="wp-publications-featured-image">
+											<?php echo get_the_post_thumbnail( $pub['post_id'], 'thumbnail', array( 'class' => 'wp-publications-thumb' ) ); ?>
+										</div>
+									<?php endif; ?>
+									<div class="wp-publications-text">
+										<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+									</div>
 								</li>
 							<?php endforeach; ?>
 						</ol>

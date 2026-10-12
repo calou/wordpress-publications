@@ -31,6 +31,10 @@
     "maxPublications": {
       "type": "number",
       "default": 0
+    },
+    "showFeaturedImage": {
+      "type": "boolean",
+      "default": false
     }
   },
   "textdomain": "publications",

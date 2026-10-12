@@ -37,6 +37,31 @@
 	.wp-publications-item {
 		margin-bottom: 1.1rem;
 		line-height: 1.5;
+
+		// Side-by-side layout when a featured image is present.
+		&.has-featured-image {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+
+			.wp-publications-featured-image {
+				flex-shrink: 0;
+				width: 300px;
+
+				.wp-publications-thumb {
+					display: block;
+					width: 100%;
+					height: auto;
+					object-fit: cover;
+					border-radius: 2px;
+				}
+			}
+
+			.wp-publications-text {
+				flex: 1;
+				min-width: 0;
+			}
+		}
 	}
 
 	/* Timeline (sticky year navigator) */

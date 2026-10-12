@@ -38,6 +38,10 @@ return array(
 			'maxPublications' => array(
 				'type' => 'number',
 				'default' => 0
+			),
+			'showFeaturedImage' => array(
+				'type' => 'boolean',
+				'default' => false
 			)
 		),
 		'textdomain' => 'publications',
