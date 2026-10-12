@@ -83,6 +83,9 @@ export default function Edit({ attributes, setAttributes }) {
                 ) : (
                     <p>No tags selected. Use the sidebar to select tags.</p>
                 )}
+                <p>
+                    <em>Year timeline: {showYearTimeline ? 'shown' : 'hidden'}</em>
+                </p>
             </div>
         </>
     );
