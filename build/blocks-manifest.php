@@ -8,7 +8,7 @@ return array(
 		'version' => '0.1.0',
 		'title' => 'publications',
 		'category' => 'widgets',
-		'icon' => 'smiley',
+		'icon' => 'book',
 		'description' => 'List of publications',
 		'example' => array(
 			
