@@ -30,6 +30,10 @@ return array(
 			'showYearTimeline' => array(
 				'type' => 'boolean',
 				'default' => true
+			),
+			'showYearHeadings' => array(
+				'type' => 'boolean',
+				'default' => true
 			)
 		),
 		'textdomain' => 'publications',

@@ -23,6 +23,10 @@
     "showYearTimeline": {
       "type": "boolean",
       "default": true
+    },
+    "showYearHeadings": {
+      "type": "boolean",
+      "default": true
     }
   },
   "textdomain": "publications",

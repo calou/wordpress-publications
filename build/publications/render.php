@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $selected_tags = isset( $attributes['selectedTags'] ) ? $attributes['selectedTags'] : array();
 $match_all     = $attributes['matchAllTags'] ?? false;
 $show_timeline = $attributes['showYearTimeline'] ?? true;
+$show_headings = $attributes['showYearHeadings'] ?? true;
 
 // Build query args
 $args = array(
@@ -91,7 +92,9 @@ ob_start();
 			<div class="wp-publications-content">
 				<?php foreach ( $publications_by_year as $year => $publications ) : ?>
 					<div id="wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-year-group">
-						<h3 class="wp-publications-year-heading"><?php echo esc_html( $year ); ?></h3>
+						<?php if ( $show_headings ) : ?>
+							<h3 class="wp-publications-year-heading"><?php echo esc_html( $year ); ?></h3>
+						<?php endif; ?>
 						<ol class="wp-publications-list">
 							<?php foreach ( $publications as $pub ) : ?>
 								<li class="wp-publications-item">
@@ -104,7 +107,9 @@ ob_start();
 
 				<?php if ( ! empty( $unknown_publications ) ) : ?>
 					<div id="wp-publications-unknown-year" class="wp-publications-year-group wp-publications-year-group-unknown">
-						<h3 class="wp-publications-year-heading"><?php echo esc_html( $unknown_label ); ?></h3>
+						<?php if ( $show_headings ) : ?>
+							<h3 class="wp-publications-year-heading"><?php echo esc_html( $unknown_label ); ?></h3>
+						<?php endif; ?>
 						<ol class="wp-publications-list">
 							<?php foreach ( $unknown_publications as $pub ) : ?>
 								<li class="wp-publications-item">

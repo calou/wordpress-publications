@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedTags, matchAllTags, showYearTimeline } = attributes;
+    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings } = attributes;
 
     // Fetch all available tags
     const { tags, isLoading } = useSelect((select) => {
@@ -69,6 +69,12 @@ export default function Edit({ attributes, setAttributes }) {
                                 checked={showYearTimeline}
                                 onChange={(value) => setAttributes({ showYearTimeline: value })}
                             />
+                            <ToggleControl
+                                label="Show year headings"
+                                help={"Display the year as an h3 above each group in the list"}
+                                checked={showYearHeadings}
+                                onChange={(value) => setAttributes({ showYearHeadings: value })}
+                            />
                         </>
                     )}
                 </PanelBody>
@@ -85,6 +91,9 @@ export default function Edit({ attributes, setAttributes }) {
                 )}
                 <p>
                     <em>Year timeline: {showYearTimeline ? 'shown' : 'hidden'}</em>
+                </p>
+                <p>
+                    <em>Year headings: {showYearHeadings ? 'shown' : 'hidden'}</em>
                 </p>
             </div>
         </>
