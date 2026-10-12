@@ -1,12 +1,118 @@
 /**
- * The following styles get applied both on the front of your site
- * and in the editor.
- *
- * Replace them with your own styles or remove the file completely.
+ * Frontend + editor styles for the Publications block.
  */
 
-.wp-block-create-block-todo-list {
-	background-color: #21759b;
-	color: #fff;
-	padding: 2px;
+.wp-block-create-block-publications {
+	.wp-publications-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 2rem;
+		align-items: start;
+	}
+
+	.wp-publications-content {
+		min-width: 0;
+	}
+
+	/* Year groups */
+	.wp-publications-year-group {
+		// Keep the group clear of any sticky header when navigated to.
+		scroll-margin-top: 1.5rem;
+		margin-bottom: 2.5rem;
+	}
+
+	.wp-publications-year-heading {
+		font-size: 1.4em;
+		margin: 0 0 0.8em;
+		padding-bottom: 0.4em;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	.wp-publications-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.wp-publications-item {
+		margin-bottom: 1.1rem;
+		line-height: 1.5;
+	}
+
+	/* Timeline (sticky year navigator) */
+	.wp-publications-timeline {
+		position: sticky;
+		top: 1.5rem;
+		max-height: calc(100vh - 3rem);
+		overflow-y: auto;
+		align-self: start;
+		padding: 0.75rem 1rem;
+		border-left: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	.wp-publications-timeline-title {
+		font-size: 0.85em;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: 0 0 0.5rem;
+		opacity: 0.6;
+	}
+
+	.wp-publications-timeline-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.wp-publications-timeline-link {
+		display: block;
+		padding: 0.35rem 0.6rem;
+		color: inherit;
+		text-decoration: none;
+		border-left: 2px solid transparent;
+		transition: border-color 0.2s ease, color 0.2s ease;
+		line-height: 1.3;
+
+		&:hover {
+			color: #21759b;
+		}
+
+		&.is-active {
+			border-left-color: #21759b;
+			color: #21759b;
+			font-weight: 600;
+		}
+	}
+
+	/* Stack the timeline above the list on smaller screens. */
+	@media (max-width: 767px) {
+		.wp-publications-layout {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.wp-publications-timeline {
+			position: static;
+			max-height: none;
+			order: -1;
+			margin: 0;
+			padding: 0.75rem 0;
+			border-left: none;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+		}
+
+		.wp-publications-timeline-list {
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 0.25rem;
+		}
+
+		.wp-publications-timeline-title {
+			display: none;
+		}
+	}
 }

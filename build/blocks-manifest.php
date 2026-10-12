@@ -26,12 +26,17 @@ return array(
 			'matchAllTags' => array(
 				'type' => 'boolean',
 				'default' => 'false'
+			),
+			'showYearTimeline' => array(
+				'type' => 'boolean',
+				'default' => true
 			)
 		),
 		'textdomain' => 'publications',
 		'editorScript' => 'file:./index.js',
 		'editorStyle' => 'file:./index.css',
 		'style' => 'file:./style-index.css',
-		'render' => 'file:./render.php'
+		'render' => 'file:./render.php',
+		'viewScript' => 'file:./view.js'
 	)
 );

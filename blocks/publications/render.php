@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $selected_tags = isset( $attributes['selectedTags'] ) ? $attributes['selectedTags'] : array();
 $match_all     = $attributes['matchAllTags'] ?? false;
+$show_timeline = $attributes['showYearTimeline'] ?? true;
 
 // Build query args
 $args = array(
@@ -79,18 +80,36 @@ ob_start();
 			<?php esc_html_e( 'No publications found.', 'wp-publications' ); ?>
 		</p>
 	<?php else : ?>
-		<?php foreach ( $publications_by_year as $year => $publications ) : ?>
-			<div class="wp-publications-year-group">
-				<h3 class="wp-publications-year-heading"><?php echo esc_html( $year ); ?></h3>
-				<ol class="wp-publications-list">
-					<?php foreach ( $publications as $pub ) : ?>
-						<li class="wp-publications-item">
-							<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
-						</li>
-					<?php endforeach; ?>
-				</ol>
+		<div class="wp-publications-layout">
+			<div class="wp-publications-content">
+				<?php foreach ( $publications_by_year as $year => $publications ) : ?>
+					<div id="wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-year-group">
+						<ol class="wp-publications-list">
+							<?php foreach ( $publications as $pub ) : ?>
+								<li class="wp-publications-item">
+									<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+								</li>
+							<?php endforeach; ?>
+						</ol>
+					</div>
+				<?php endforeach; ?>
 			</div>
-		<?php endforeach; ?>
+
+			<?php if ( $show_timeline && count( $publications_by_year ) > 1 ) : ?>
+				<nav class="wp-publications-timeline" aria-label="<?php esc_attr_e( 'Navigate by publication year', 'wp-publications' ); ?>">
+					<p class="wp-publications-timeline-title"><?php esc_html_e( 'Years', 'wp-publications' ); ?></p>
+					<ul class="wp-publications-timeline-list">
+						<?php foreach ( $publications_by_year as $year => $publications ) : ?>
+							<li>
+								<a href="#wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-timeline-link">
+									<?php echo esc_html( $year ); ?>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</nav>
+			<?php endif; ?>
+		</div>
 	<?php endif; ?>
 </div>
 <?php

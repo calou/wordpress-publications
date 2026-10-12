@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedTags, matchAllTags } = attributes;
+    const { selectedTags, matchAllTags, showYearTimeline } = attributes;
 
     // Fetch all available tags
     const { tags, isLoading } = useSelect((select) => {
@@ -62,6 +62,12 @@ export default function Edit({ attributes, setAttributes }) {
                                 }
                                 checked={matchAllTags}
                                 onChange={(value) => setAttributes({ matchAllTags: value })}
+                            />
+                            <ToggleControl
+                                label="Show year timeline"
+                                help={"Display a sticky year navigator on the right"}
+                                checked={showYearTimeline}
+                                onChange={(value) => setAttributes({ showYearTimeline: value })}
                             />
                         </>
                     )}
