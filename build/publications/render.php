@@ -13,12 +13,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$selected_tags = isset( $attributes['selectedTags'] ) ? $attributes['selectedTags'] : array();
-$match_all     = $attributes['matchAllTags'] ?? false;
-$show_timeline = $attributes['showYearTimeline'] ?? true;
-$show_headings = $attributes['showYearHeadings'] ?? true;
-$max_publications = isset( $attributes['maxPublications'] ) ? max( 0, (int) $attributes['maxPublications'] ) : 0;
+$selected_tags       = isset( $attributes['selectedTags'] ) ? $attributes['selectedTags'] : array();
+$match_all           = $attributes['matchAllTags'] ?? false;
+$show_timeline       = $attributes['showYearTimeline'] ?? true;
+$show_headings       = $attributes['showYearHeadings'] ?? true;
+$max_publications    = isset( $attributes['maxPublications'] ) ? max( 0, (int) $attributes['maxPublications'] ) : 0;
 $show_featured_image = $attributes['showFeaturedImage'] ?? false;
+$show_client_filter  = $attributes['showClientFilter'] ?? false;
 
 // Build query args
 $args = array(
@@ -43,10 +44,10 @@ if ( $match_all ) {
 	$args['tag__in'] = $selected_tags;
 }
 
-$query                 = new WP_Query( $args );
-$publications_by_year  = array();
-$unknown_publications  = array();
-$unknown_label         = __( 'Unknown', 'wp-publications' );
+$query                = new WP_Query( $args );
+$publications_by_year = array();
+$unknown_publications = array();
+$unknown_label        = __( 'Unknown', 'wp-publications' );
 
 while ( $query->have_posts() ) {
 	$query->the_post();
@@ -80,6 +81,9 @@ wp_reset_postdata();
 krsort( $publications_by_year );
 
 // Build output
+$filter_id          = wp_unique_id( 'wp-publications-filter-' );
+$show_timeline_nav  = $show_timeline && count( $publications_by_year ) > 1;
+$show_sidebar       = $show_timeline_nav || $show_client_filter;
 $wrapper_attributes = get_block_wrapper_attributes();
 
 ob_start();
@@ -135,21 +139,34 @@ ob_start();
 						</ol>
 					</div>
 				<?php endif; ?>
+				<?php if ( $show_client_filter ) : ?>
+					<p class="wp-publications-filter-empty is-hidden"><?php esc_html_e( 'No publications match your search.', 'wp-publications' ); ?></p>
+				<?php endif; ?>
 			</div>
 
-			<?php if ( $show_timeline && count( $publications_by_year ) > 1 ) : ?>
-				<nav class="wp-publications-timeline" aria-label="<?php esc_attr_e( 'Navigate by publication year', 'wp-publications' ); ?>">
-					<p class="wp-publications-timeline-title"><?php esc_html_e( 'Years', 'wp-publications' ); ?></p>
-					<ul class="wp-publications-timeline-list">
-						<?php foreach ( $publications_by_year as $year => $publications ) : ?>
-							<li>
-								<a href="#wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-timeline-link">
-									<?php echo esc_html( $year ); ?>
-								</a>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</nav>
+			<?php if ( $show_sidebar ) : ?>
+				<div class="wp-publications-timeline-col">
+					<?php if ( $show_client_filter ) : ?>
+						<div class="wp-publications-filter">
+							<input id="<?php echo esc_attr( $filter_id ); ?>" type="search" class="wp-publications-filter-input" placeholder="<?php esc_attr_e( 'Search publications...', 'wp-publications' ); ?>" aria-label="<?php esc_attr_e( 'Search', 'wp-publications' ); ?>">
+						</div>
+					<?php endif; ?>
+
+					<?php if ( $show_timeline_nav ) : ?>
+						<nav class="wp-publications-timeline" aria-label="<?php esc_attr_e( 'Navigate by publication year', 'wp-publications' ); ?>">
+							<p class="wp-publications-timeline-title"><?php esc_html_e( 'Years', 'wp-publications' ); ?></p>
+							<ul class="wp-publications-timeline-list">
+								<?php foreach ( $publications_by_year as $year => $publications ) : ?>
+									<li>
+										<a href="#wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-timeline-link">
+											<?php echo esc_html( $year ); ?>
+										</a>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						</nav>
+					<?php endif; ?>
+				</div>
 			<?php endif; ?>
 		</div>
 	<?php endif; ?>

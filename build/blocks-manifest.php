@@ -42,6 +42,10 @@ return array(
 			'showFeaturedImage' => array(
 				'type' => 'boolean',
 				'default' => false
+			),
+			'showClientFilter' => array(
+				'type' => 'boolean',
+				'default' => false
 			)
 		),
 		'textdomain' => 'publications',

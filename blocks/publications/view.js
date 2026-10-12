@@ -70,9 +70,13 @@ function initTimeline( block ) {
 	function updateActive() {
 		// Trigger once the section top passes roughly the upper quarter of the viewport.
 		const triggerAt = window.scrollY + window.innerHeight * 0.25;
-		let activeId = sections[ 0 ].id;
+		let activeId = null;
 
 		for ( const section of sections ) {
+			// Skip year groups hidden by the client-side filter.
+			if ( section.offsetParent === null ) {
+				continue;
+			}
 			const top = section.getBoundingClientRect().top + window.scrollY;
 			if ( top <= triggerAt ) {
 				activeId = section.id;
@@ -81,12 +85,24 @@ function initTimeline( block ) {
 			}
 		}
 
-		// When scrolled to the very bottom, always highlight the last year.
+		if ( activeId === null ) {
+			const firstVisible = sections.find(
+				( section ) => section.offsetParent !== null
+			);
+			activeId = firstVisible ? firstVisible.id : sections[ 0 ].id;
+		}
+
+		// When scrolled to the very bottom, always highlight the last visible year.
+		const lastVisible = [ ...sections ]
+			.reverse()
+			.find( ( section ) => section.offsetParent !== null );
+
 		if (
+			lastVisible &&
 			window.innerHeight + window.scrollY >=
-			document.documentElement.scrollHeight - 2
+				document.documentElement.scrollHeight - 2
 		) {
-			activeId = sections[ sections.length - 1 ].id;
+			activeId = lastVisible.id;
 		}
 
 		setActive( activeId );
@@ -120,8 +136,83 @@ function initTimeline( block ) {
 	updateActive();
 }
 
+/**
+ * Initialize the client-side search filter for a single Publications block.
+ *
+ * @param {HTMLElement} block The block wrapper element.
+ */
+function initFilter( block ) {
+	const input = block.querySelector( '.wp-publications-filter-input' );
+	if ( ! input ) {
+		return;
+	}
+
+	const items = Array.from( block.querySelectorAll( '.wp-publications-item' ) );
+	const yearGroups = Array.from(
+		block.querySelectorAll( '.wp-publications-year-group' )
+	);
+	const timelineLinks = Array.from(
+		block.querySelectorAll( '.wp-publications-timeline-link' )
+	);
+	const noResults = block.querySelector( '.wp-publications-filter-empty' );
+
+	if ( items.length === 0 ) {
+		return;
+	}
+
+	const linkForGroup = ( group ) =>
+		timelineLinks.find(
+			( link ) => link.getAttribute( 'href' ) === '#' + group.id
+		);
+
+	/**
+	 * Apply the current search term to the list.
+	 */
+	function applyFilter() {
+		const query = input.value.trim().toLowerCase();
+		let visible = 0;
+
+		items.forEach( ( item ) => {
+			const matches =
+				query === '' || item.textContent.toLowerCase().includes( query );
+			item.classList.toggle( 'is-hidden', ! matches );
+			if ( matches ) {
+				visible++;
+			}
+		} );
+
+		// Hide any year group (and its timeline link) that has no matches.
+		yearGroups.forEach( ( group ) => {
+			const hasVisible = Boolean(
+				group.querySelector( '.wp-publications-item:not(.is-hidden)' )
+			);
+			group.classList.toggle( 'is-hidden', ! hasVisible );
+
+			const link = linkForGroup( group );
+			if ( link ) {
+				link.classList.toggle( 'is-hidden', ! hasVisible );
+			}
+		} );
+
+		if ( noResults ) {
+			noResults.classList.toggle( 'is-hidden', visible > 0 );
+		}
+	}
+
+	let timer;
+	input.addEventListener( 'input', () => {
+		window.clearTimeout( timer );
+		timer = window.setTimeout( applyFilter, 120 );
+	} );
+
+	applyFilter();
+}
+
 document.addEventListener( 'DOMContentLoaded', () => {
 	document
 		.querySelectorAll( '.wp-block-create-block-publications' )
-		.forEach( initTimeline );
+		.forEach( ( block ) => {
+			initTimeline( block );
+			initFilter( block );
+		} );
 } );

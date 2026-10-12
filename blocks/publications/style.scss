@@ -14,6 +14,42 @@
 		min-width: 0;
 	}
 
+	/* Client-side filter (rendered in the sidebar, above the timeline) */
+	.wp-publications-filter {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-bottom: 1.25rem;
+    padding-top: 1em;
+
+		.wp-publications-filter-input {
+			width: 100%;
+			max-width: 200px;
+			padding: 0.25rem 0.46rem;
+			border: 1px solid rgba( 0, 0, 0, 0.15 );
+			border-radius: 2px;
+
+			&:focus {
+				outline: 1px solid #21759b;
+				border-color: #21759b;
+			}
+		}
+	}
+
+	.wp-publications-filter-empty {
+		margin: 1rem 0;
+		font-style: italic;
+		opacity: 0.7;
+	}
+
+	// Hidden state used by the client-side filter.
+	.wp-publications-item.is-hidden,
+	.wp-publications-year-group.is-hidden,
+	.wp-publications-timeline-link.is-hidden,
+	.wp-publications-filter-empty.is-hidden {
+		display: none;
+	}
+
 	/* Year groups */
 	.wp-publications-year-group {
 		// Keep the group clear of any sticky header when navigated to.
@@ -66,13 +102,17 @@
 		}
 	}
 
-	/* Timeline (sticky year navigator) */
-	.wp-publications-timeline {
+	/* Sticky sidebar: hosts the filter and the year navigator. */
+	.wp-publications-timeline-col {
 		position: sticky;
 		top: 1.5rem;
 		max-height: calc(100vh - 3rem);
 		overflow-y: auto;
 		align-self: start;
+	}
+
+	/* Year navigator. */
+	.wp-publications-timeline {
 		padding: 0.75rem 1rem;
 		border-left: 1px solid rgba(0, 0, 0, 0.08);
 	}
@@ -122,10 +162,13 @@
 			gap: 1rem;
 		}
 
-		.wp-publications-timeline {
+		.wp-publications-timeline-col {
 			position: static;
 			max-height: none;
 			order: -1;
+		}
+
+		.wp-publications-timeline {
 			margin: 0;
 			padding: 0.75rem 0;
 			border-left: none;

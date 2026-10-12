@@ -35,6 +35,10 @@
     "showFeaturedImage": {
       "type": "boolean",
       "default": false
+    },
+    "showClientFilter": {
+      "type": "boolean",
+      "default": false
     }
   },
   "textdomain": "publications",

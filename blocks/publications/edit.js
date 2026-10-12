@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
 
 export default function Edit({ attributes, setAttributes }) {
-    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings, maxPublications, showFeaturedImage } = attributes;
+    const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings, maxPublications, showFeaturedImage, showClientFilter } = attributes;
 
     // Fetch all available tags
     const { tags, isLoading } = useSelect((select) => {
@@ -92,6 +92,12 @@ export default function Edit({ attributes, setAttributes }) {
                                 checked={showFeaturedImage}
                                 onChange={(value) => setAttributes({ showFeaturedImage: value })}
                             />
+                            <ToggleControl
+                                label="Show client-side filter"
+                                help={"Display a search box that filters publications in the browser"}
+                                checked={showClientFilter}
+                                onChange={(value) => setAttributes({ showClientFilter: value })}
+                            />
                         </>
                     )}
                 </PanelBody>
@@ -117,6 +123,9 @@ export default function Edit({ attributes, setAttributes }) {
                 </p>
                 <p>
                     <em>Featured image: {showFeaturedImage ? 'shown' : 'hidden'}</em>
+                </p>
+                <p>
+                    <em>Client-side filter: {showClientFilter ? 'shown' : 'hidden'}</em>
                 </p>
             </div>
         </>
