@@ -58,10 +58,16 @@
 	}
 
 	.wp-publications-year-heading {
-		font-size: 1.4em;
 		margin: 0 0 0.8em;
 		padding-bottom: 0.4em;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	.wp-publications-year-count {
+		font-weight: 400;
+		font-size: 0.85em;
+		opacity: 0.6;
+		margin-left: 0.35em;
 	}
 
 	.wp-publications-list {
@@ -118,7 +124,6 @@
 	}
 
 	.wp-publications-timeline-title {
-		font-size: 0.85em;
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -153,6 +158,13 @@
 			color: #21759b;
 			font-weight: 600;
 		}
+	}
+
+	.wp-publications-timeline-count {
+		font-weight: 400;
+		font-size: 0.85em;
+		opacity: 0.6;
+		margin-left: 0.3em;
 	}
 
 	/* Stack the timeline above the list on smaller screens. */

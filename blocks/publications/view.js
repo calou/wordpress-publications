@@ -188,9 +188,24 @@ function initFilter( block ) {
 			);
 			group.classList.toggle( 'is-hidden', ! hasVisible );
 
+			// Update the publication count shown next to the year in the body.
+			const visibleCount = group.querySelectorAll(
+				'.wp-publications-item:not(.is-hidden)'
+			).length;
+			const countEl = group.querySelector( '.wp-publications-year-count' );
+			if ( countEl ) {
+				countEl.textContent = '(' + visibleCount + ')';
+			}
+
 			const link = linkForGroup( group );
 			if ( link ) {
 				link.classList.toggle( 'is-hidden', ! hasVisible );
+
+				// Update the publication count shown next to the year in the timeline.
+				const linkCount = link.querySelector( '.wp-publications-timeline-count' );
+				if ( linkCount ) {
+					linkCount.textContent = '(' + visibleCount + ')';
+				}
 			}
 		} );
 

@@ -99,7 +99,10 @@ ob_start();
 				<?php foreach ( $publications_by_year as $year => $publications ) : ?>
 					<div id="wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-year-group">
 						<?php if ( $show_headings ) : ?>
-							<h3 class="wp-publications-year-heading"><?php echo esc_html( $year ); ?></h3>
+							<h3 class="wp-publications-year-heading">
+								<?php echo esc_html( $year ); ?>
+								<span class="wp-publications-year-count"><?php echo esc_html( '(' . count( $publications ) . ')' ); ?></span>
+							</h3>
 						<?php endif; ?>
 						<ol class="wp-publications-list">
 							<?php foreach ( $publications as $pub ) : ?>
@@ -121,7 +124,10 @@ ob_start();
 				<?php if ( ! empty( $unknown_publications ) ) : ?>
 					<div id="wp-publications-unknown-year" class="wp-publications-year-group wp-publications-year-group-unknown">
 						<?php if ( $show_headings ) : ?>
-							<h3 class="wp-publications-year-heading"><?php echo esc_html( $unknown_label ); ?></h3>
+							<h3 class="wp-publications-year-heading">
+								<?php echo esc_html( $unknown_label ); ?>
+								<span class="wp-publications-year-count"><?php echo esc_html( '(' . count( $unknown_publications ) . ')' ); ?></span>
+							</h3>
 						<?php endif; ?>
 						<ol class="wp-publications-list">
 							<?php foreach ( $unknown_publications as $pub ) : ?>
@@ -160,6 +166,7 @@ ob_start();
 									<li>
 										<a href="#wp-publications-year-<?php echo esc_attr( sanitize_title( $year ) ); ?>" class="wp-publications-timeline-link">
 											<?php echo esc_html( $year ); ?>
+											<span class="wp-publications-timeline-count"><?php echo esc_html( '(' . count( $publications ) . ')' ); ?></span>
 										</a>
 									</li>
 								<?php endforeach; ?>
