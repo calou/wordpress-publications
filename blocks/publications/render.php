@@ -30,7 +30,7 @@ $args = array(
 	'order'          => 'DESC',
 	'meta_query'     => array(
 		array(
-			'key'     => WP_PUBLICATIONS_META_CROSSREF,
+			'key'     => WP_PUBLICATIONS_META_WORK,
 			'compare' => 'EXISTS',
 		),
 	),
@@ -53,16 +53,16 @@ while ( $query->have_posts() ) {
 	$query->the_post();
 	$post_id = get_the_ID();
 
-	// Get Crossref data
-	$crossref_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_CROSSREF, true );
-	$crossref_data = $crossref_json ? json_decode( $crossref_json, true ) : null;
+	// Get OpenAlex work data
+	$work_json = get_post_meta( $post_id, WP_PUBLICATIONS_META_WORK, true );
+	$work      = $work_json ? json_decode( $work_json, true ) : null;
 
 	// Extract year
-	$year = wp_publications_block_extract_year( $crossref_data );
+	$year = wp_publications_block_extract_year( $work );
 
 	$publication = array(
 		'post_id'       => $post_id,
-		'crossref_data' => $crossref_data,
+		'work'          => $work,
 	);
 
 	if ( $year === $unknown_label ) {
@@ -110,7 +110,7 @@ ob_start();
 										</div>
 									<?php endif; ?>
 									<div class="wp-publications-text">
-										<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+										<?php echo wp_publications_block_format_apa( $pub['work'], $pub['post_id'] ); ?>
 									</div>
 								</li>
 							<?php endforeach; ?>
@@ -132,7 +132,7 @@ ob_start();
 										</div>
 									<?php endif; ?>
 									<div class="wp-publications-text">
-										<?php echo wp_publications_block_format_apa( $pub['crossref_data'], $pub['post_id'] ); ?>
+										<?php echo wp_publications_block_format_apa( $pub['work'], $pub['post_id'] ); ?>
 									</div>
 								</li>
 							<?php endforeach; ?>

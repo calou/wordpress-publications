@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Get the mailto email for Crossref polite pool
+ * Get the mailto email for the OpenAlex polite pool
  */
 function wp_publications_get_mailto() {
 	return get_option( 'wp_publications_mailto', '' );

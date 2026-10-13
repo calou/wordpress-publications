@@ -1,6 +1,6 @@
 === WP Publications ===
 Contributors: your-username
-Tags: publications, crossref, doi, academic, research
+Tags: publications, openalex, doi, academic, research
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
@@ -8,21 +8,21 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Fetch and display academic publications from Crossref API based on DOIs.
+Fetch and display academic publications from the OpenAlex API based on DOIs.
 
 == Description ==
 
-WP Publications allows you to import academic publications from the Crossref API using DOIs. Each publication is created as a regular WordPress post with full metadata stored for reference.
+WP Publications allows you to import academic publications from the OpenAlex API using DOIs. Each publication is created as a regular WordPress post with full metadata stored for reference.
 
 Features:
 
 * Import publications as regular posts using DOIs
 * Automatic content generation with DOI, journal info, authors (with ORCID links), abstract, and images
-* Full Crossref API response stored as metadata
+* Full OpenAlex response stored as metadata
 * Journal information fetched and stored separately
 * Select2-powered tag selection
 * Progress bar during import
-* Respects Crossref polite pool with configurable delays
+* Respects the OpenAlex polite pool with configurable delays
 * **Publications block**: Display publications filtered by tags, grouped by year in APA format
 
 == Installation ==
@@ -36,7 +36,7 @@ Features:
 
 Before importing, you must configure:
 
-1. **Email Address** (required): Used for Crossref's "polite pool" to get better rate limits
+1. **Email Address** (required): Used for OpenAlex's "polite pool" to get better rate limits
 2. **API Delay** (optional): Milliseconds between requests (default: 1000ms)
 
 == Usage ==

@@ -1,7 +1,7 @@
 {
   "name": "wp-publications",
   "version": "1.0.0",
-  "description": "Fetch and display academic publications from Crossref API",
+  "description": "Fetch and display academic publications from OpenAlex API",
   "main": "build/index.js",
 	"scripts": {
 		"build": "wp-scripts build --webpack-copy-php --blocks-manifest --source-path=blocks",

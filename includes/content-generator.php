@@ -8,37 +8,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Generate post content from Crossref data
+ * Generate post content from normalized work data
  */
-function wp_publications_generate_content( $crossref_data ) {
+function wp_publications_generate_content( $work ) {
 	$blocks = array();
 
 	// Publication date
-	$pub_date = wp_publications_format_date( $crossref_data );
+	$pub_date = wp_publications_format_date( $work );
 	if ( ! empty( $pub_date ) ) {
 		$blocks[] = "<!-- wp:paragraph -->\n"
 			. '<p>' . esc_html( $pub_date ) . '</p>'
 			. "\n<!-- /wp:paragraph -->";
 	}
 
-	// Volume/Issue/Page
+	// Volume/Issue/Pages
 	$citation_parts = array();
-	if ( isset( $crossref_data['message']['publisher'] ) ) {
-		$citation_parts[] = $crossref_data['message']['publisher'];
+	if ( ! empty( $work['publisher'] ) ) {
+		$citation_parts[] = $work['publisher'];
 	}
-	if ( isset( $crossref_data['message']['volume'] ) ) {
-		$citation_parts[] = __( 'Vol.', 'wp-publications' ) . ' ' . $crossref_data['message']['volume'];
+	if ( ! empty( $work['volume'] ) ) {
+		$citation_parts[] = __( 'Vol.', 'wp-publications' ) . ' ' . $work['volume'];
 	}
-	if ( isset( $crossref_data['message']['issue'] ) ) {
-		$citation_parts[] = __( 'Issue', 'wp-publications' ) . ' ' . $crossref_data['message']['issue'];
+	if ( ! empty( $work['issue'] ) ) {
+		$citation_parts[] = __( 'Issue', 'wp-publications' ) . ' ' . $work['issue'];
 	}
-	if ( isset( $crossref_data['message']['page'] ) ) {
-		$citation_parts[] = __( 'pp.', 'wp-publications' ) . ' ' . $crossref_data['message']['page'];
+	if ( ! empty( $work['pages'] ) ) {
+		$citation_parts[] = __( 'pp.', 'wp-publications' ) . ' ' . $work['pages'];
 	}
 
-	$doi = isset( $crossref_data['message']['DOI'] ) ? $crossref_data['message']['DOI'] : '';
+	$doi = isset( $work['doi'] ) ? $work['doi'] : '';
 	if ( ! empty( $doi ) ) {
-			$citation_parts[] = '<a href="' . esc_url( 'https://doi.org/' . $doi ) . '" target="_blank" rel="noopener">' . esc_html( $doi ) . '</a></p>';
+		$citation_parts[] = '<a href="' . esc_url( 'https://doi.org/' . $doi ) . '" target="_blank" rel="noopener">' . esc_html( $doi ) . '</a></p>';
 	}
 
 	if ( ! empty( $citation_parts ) ) {
@@ -46,11 +46,15 @@ function wp_publications_generate_content( $crossref_data ) {
 	}
 
 	// Authors
-	$authors = wp_publications_extract_authors( $crossref_data );
+	$authors = wp_publications_extract_authors( $work );
 	if ( ! empty( $authors ) ) {
 		$author_parts = array();
 		foreach ( $authors as $author ) {
-			$name = trim( $author['given'] . ' ' . $author['family'] );
+			$name = trim( $author['name'] );
+			if ( empty( $name ) ) {
+				$name = trim( $author['given'] . ' ' . $author['family'] );
+			}
+
 			if ( ! empty( $author['orcid'] ) ) {
 				$orcid_url = $author['orcid'];
 				if ( strpos( $orcid_url, 'http' ) !== 0 ) {
@@ -68,7 +72,7 @@ function wp_publications_generate_content( $crossref_data ) {
 	}
 
 	// Abstract
-	$abstract = wp_publications_extract_abstract( $crossref_data );
+	$abstract = wp_publications_extract_abstract( $work );
 	if ( ! empty( $abstract ) ) {
 		$blocks[] = "<!-- wp:heading {\"level\":3} -->\n"
 			. '<h3 class="wp-block-heading">' . esc_html__( 'Abstract', 'wp-publications' ) . '</h3>'
@@ -82,51 +86,44 @@ function wp_publications_generate_content( $crossref_data ) {
 }
 
 /**
- * Format publication date from Crossref data
+ * Format publication date from normalized work data
  */
-function wp_publications_format_date( $crossref_data ) {
-	$date_parts = null;
+function wp_publications_format_date( $work ) {
+	$date = isset( $work['date'] ) ? $work['date'] : '';
 
-	// Try different date fields
-	$date_fields = array( 'published-print', 'published-online', 'issued', 'created' );
-
-	foreach ( $date_fields as $field ) {
-		if ( isset( $crossref_data['message'][ $field ]['date-parts'][0] ) ) {
-			$date_parts = $crossref_data['message'][ $field ]['date-parts'][0];
-			break;
-		}
-	}
-
-	if ( empty( $date_parts ) ) {
+	if ( empty( $date ) ) {
 		return '';
 	}
 
-	$year  = isset( $date_parts[0] ) ? $date_parts[0] : '';
-	$month = isset( $date_parts[1] ) ? str_pad( $date_parts[1], 2, '0', STR_PAD_LEFT ) : '';
-	$day   = isset( $date_parts[2] ) ? str_pad( $date_parts[2], 2, '0', STR_PAD_LEFT ) : '';
-
-	if ( ! empty( $year ) && ! empty( $month ) && ! empty( $day ) ) {
-		return date_i18n( get_option( 'date_format' ), strtotime( "$year-$month-$day" ) );
-	} elseif ( ! empty( $year ) && ! empty( $month ) ) {
-		return date_i18n( 'F Y', strtotime( "$year-$month-01" ) );
-	} elseif ( ! empty( $year ) ) {
-		return $year;
+	// Year only.
+	if ( preg_match( '/^\d{4}$/', $date ) ) {
+		return $date;
 	}
 
-	return '';
+	$timestamp = strtotime( $date );
+	if ( false === $timestamp ) {
+		return $date;
+	}
+
+	// Year + month.
+	if ( preg_match( '/^\d{4}-\d{2}$/', $date ) ) {
+		return date_i18n( 'F Y', $timestamp );
+	}
+
+	// Full date.
+	return date_i18n( get_option( 'date_format' ), $timestamp );
 }
 
 /**
  * Get journal image from journal data
  */
 function wp_publications_get_journal_image( $journal_data ) {
-	if ( empty( $journal_data ) || ! isset( $journal_data['message'] ) ) {
+	if ( empty( $journal_data ) || ! is_array( $journal_data ) ) {
 		return '';
 	}
 
-	// Check for cover image or other image fields
-	if ( isset( $journal_data['message']['cover-url'] ) ) {
-		return $journal_data['message']['cover-url'];
+	if ( ! empty( $journal_data['image'] ) ) {
+		return $journal_data['image'];
 	}
 
 	return '';

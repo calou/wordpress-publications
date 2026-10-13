@@ -33,7 +33,7 @@ function wp_publications_register_settings() {
 
 	add_settings_section(
 		'wp_publications_api_section',
-		__( 'Crossref API Settings', 'wp-publications' ),
+		__( 'OpenAlex API Settings', 'wp-publications' ),
 		'wp_publications_api_section_callback',
 		'wp_publications_settings'
 	);
@@ -56,7 +56,7 @@ function wp_publications_register_settings() {
 }
 
 function wp_publications_api_section_callback() {
-	echo '<p>' . esc_html__( 'Configure the Crossref API settings. The email address is required and will be used for the "polite pool" to get better rate limits.', 'wp-publications' ) . '</p>';
+	echo '<p>' . esc_html__( 'Configure the OpenAlex API settings. The email address is required and will be sent with each request to the OpenAlex polite pool.', 'wp-publications' ) . '</p>';
 }
 
 function wp_publications_mailto_field_callback() {
@@ -75,10 +75,10 @@ function wp_publications_mailto_field_callback() {
 		required
 	/>
 	<p class="description">
-		<?php esc_html_e( 'This email will be sent with each API request to Crossref (polite pool). A valid email is required.', 'wp-publications' ); ?>
+		<?php esc_html_e( 'This email will be sent with each API request to OpenAlex (polite pool). A valid email is required.', 'wp-publications' ); ?>
 		<br />
-		<a href="https://github.com/CrossRef/rest-api-doc#good-manners--more-reliable-service" target="_blank" rel="noopener">
-			<?php esc_html_e( 'Learn more about the Crossref polite pool', 'wp-publications' ); ?>
+		<a href="https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication#the-polite-pool" target="_blank" rel="noopener">
+			<?php esc_html_e( 'Learn more about the OpenAlex polite pool', 'wp-publications' ); ?>
 		</a>
 	</p>
 	<?php
@@ -99,7 +99,7 @@ function wp_publications_api_delay_field_callback() {
 	/>
 	<span><?php esc_html_e( 'milliseconds', 'wp-publications' ); ?></span>
 	<p class="description">
-		<?php esc_html_e( 'Delay between API requests to avoid overloading the Crossref servers. Recommended: 1000ms (1 second).', 'wp-publications' ); ?>
+		<?php esc_html_e( 'Delay between API requests to avoid overloading the OpenAlex servers. Recommended: 1000ms (1 second).', 'wp-publications' ); ?>
 	</p>
 	<?php
 }
