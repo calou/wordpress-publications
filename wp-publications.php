@@ -34,6 +34,7 @@ if ( is_admin() ) {
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/import-page.php';
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/settings-page.php';
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/columns.php';
+	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/quick-edit.php';
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/meta-box.php';
 }
 

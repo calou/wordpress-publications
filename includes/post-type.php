@@ -36,6 +36,7 @@ function wp_publications_register_post_type() {
 		'show_ui'             => true,
 		'show_in_menu'        => 'wp-publications',
 		'show_in_rest'        => true,
+		'taxonomies'          => array( 'post_tag' ),
 		'supports'            => array( 'title', 'editor', 'thumbnail' ),
 		'has_archive'         => false,
 		'rewrite'             => false,
