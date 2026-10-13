@@ -80,8 +80,12 @@
 	}
 
 	.wp-publications-item {
-		margin-bottom: 1.1rem;
+		margin-bottom: 2rem;
 		line-height: 1.5;
+
+    & b {
+       font-weight: 500;
+    }
 
 		// Side-by-side layout when a featured image is present.
 		&.has-featured-image {
