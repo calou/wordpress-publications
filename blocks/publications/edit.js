@@ -2,6 +2,7 @@ import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, Spinner, ToggleControl, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { FormTokenField } from '@wordpress/components';
+import ServerSideRender from '@wordpress/server-side-render';
 
 export default function Edit({ attributes, setAttributes }) {
     const { selectedTags, matchAllTags, showYearTimeline, showYearHeadings, maxPublications, showFeaturedImage, showClientFilter } = attributes;
@@ -104,29 +105,11 @@ export default function Edit({ attributes, setAttributes }) {
             </InspectorControls>
 
             <div {...useBlockProps()}>
-                {selectedTags && selectedTags.length > 0 ? (
-                    <>
-                        <p>Selected tags: {selectedTagNames.join(', ')}</p>
-                        <p><em>Match mode: {matchAllTags ? 'ALL tags' : 'ANY tag'}</em></p>
-                    </>
-                ) : (
-                    <p>No tags selected. Use the sidebar to select tags.</p>
-                )}
-                <p>
-                    <em>Year timeline: {showYearTimeline ? 'shown' : 'hidden'}</em>
-                </p>
-                <p>
-                    <em>Year headings: {showYearHeadings ? 'shown' : 'hidden'}</em>
-                </p>
-                <p>
-                    <em>Max publications: {maxPublications > 0 ? maxPublications : 'all'}</em>
-                </p>
-                <p>
-                    <em>Featured image: {showFeaturedImage ? 'shown' : 'hidden'}</em>
-                </p>
-                <p>
-                    <em>Client-side filter: {showClientFilter ? 'shown' : 'hidden'}</em>
-                </p>
+                <ServerSideRender
+                    block="create-block/publications"
+                    attributes={attributes}
+                    httpMethod="POST"
+                />
             </div>
         </>
     );
