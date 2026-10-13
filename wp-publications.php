@@ -22,17 +22,18 @@ define( 'WP_PUBLICATIONS_META_WORK', '_publication_work_data' );
 
 // Include required files
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/functions.php';
+require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/post-type.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/openalex-api.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/post-functions.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/content-generator.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/ajax-handlers.php';
 require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/block-functions.php';
-require_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/template-loader.php';
 
 if ( is_admin() ) {
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/admin-menu.php';
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/import-page.php';
 	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'admin/settings-page.php';
+	include_once WP_PUBLICATIONS_PLUGIN_DIR . 'includes/meta-box.php';
 }
 
 

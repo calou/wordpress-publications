@@ -133,7 +133,7 @@ function wp_publications_ajax_import_single() {
 			'title'    => $title,
 			'action'   => $action,
 			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
-			'view_url' => get_permalink( $post_id ),
+			'view_url' => isset( $work['url'] ) ? $work['url'] : '',
 		)
 	);
 }

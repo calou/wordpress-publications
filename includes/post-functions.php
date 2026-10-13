@@ -28,7 +28,7 @@ function wp_publications_create_or_update_post( $doi, $work, $tag_ids = array() 
 	$post_data = array(
 		'post_title'   => $title,
 		'post_content' => $content,
-		'post_type'    => 'post',
+		'post_type'    => 'publication',
 		'post_status'  => 'publish',
 		'post_date'    => $full_date . ' 12:00:00',
 	);
@@ -61,7 +61,6 @@ function wp_publications_create_or_update_post( $doi, $work, $tag_ids = array() 
 	}
 
 	// Save metadata
-	update_post_meta( $post_id, '_wp_page_template', 'single-publication' );
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_DOI, $doi );
 	update_post_meta( $post_id, WP_PUBLICATIONS_META_WORK, wp_json_encode( $work, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
 

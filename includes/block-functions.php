@@ -67,7 +67,7 @@ function wp_publications_block_format_apa( $work, $post_id ) {
 
 	$parts = array();
 
-	$parts[] = '<a href="' . get_permalink( $post_id ) . '" target="_blank" style="text-decoration:none;">';
+	// Title is intentionally not linked: publications have no front-end single page.
 
 	// Authors
 	$authors = wp_publications_block_format_apa_authors( $work );
@@ -103,7 +103,7 @@ function wp_publications_block_format_apa( $work, $post_id ) {
 			'b'      => array(),
 			'strong' => array(),
 		);
-		$parts[]    = '<b>' . wp_kses( $title, $title_tags ) . '.</a></b>';
+		$parts[]    = '<b>' . wp_kses( $title, $title_tags ) . '.</b>';
 	}
 
 	// Journal name (italicized)

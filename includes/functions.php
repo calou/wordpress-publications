@@ -79,7 +79,7 @@ function wp_publications_find_by_doi( $doi ) {
 	$doi = wp_publications_normalize_doi( $doi );
 
 	$args = array(
-		'post_type'      => 'post',
+		'post_type'      => 'publication',
 		'post_status'    => array( 'publish', 'draft', 'pending', 'private' ),
 		'meta_query'     => array(
 			array(

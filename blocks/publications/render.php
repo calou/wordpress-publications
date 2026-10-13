@@ -23,7 +23,7 @@ $show_client_filter  = $attributes['showClientFilter'] ?? false;
 
 // Build query args
 $args = array(
-	'post_type'      => 'post',
+	'post_type'      => 'publication',
 	'post_status'    => 'publish',
 	'posts_per_page' => $max_publications > 0 ? $max_publications : -1,
 	'orderby'        => 'date',
